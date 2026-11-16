@@ -30,14 +30,6 @@ jobs:
           source_dir: .
           extensions: cpp,hpp
 
-      - name: Run clang-tidy
-        uses: ai-warevo/.github/ci/actions/clang-tidy@main
-        with:
-          source_dir: .
-          build_dir: build
-          checks: bugprone-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*
-          header_filter: .*/include/aw/tpl/.*
-
       - name: Configure & Build Tests with Coverage
         uses: ai-warevo/.github/ci/actions/cmake-build@main
         with:
@@ -45,6 +37,14 @@ jobs:
           build_dir: build
           build_type: Debug
           extra_args: -DAW_TPL_BUILD_EXAMPLES=OFF -DAW_TPL_BUILD_TESTS=ON -DAW_TPL_ENABLE_COVERAGE=ON
+
+      - name: Run clang-tidy
+        uses: ai-warevo/.github/ci/actions/clang-tidy@main
+        with:
+          source_dir: .
+          build_dir: build
+          checks: bugprone-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*
+          header_filter: .*/include/aw/tpl/.*
 
       - name: Run CTest
         uses: ai-warevo/.github/ci/actions/ctest-run@main
