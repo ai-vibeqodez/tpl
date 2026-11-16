@@ -24,6 +24,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Check clang-format
+        uses: ai-warevo/.github/ci/actions/clang-format@main
+        with:
+          source_dir: .
+          extensions: cpp,hpp
+
+      - name: Run clang-tidy
+        uses: ai-warevo/.github/ci/actions/clang-tidy@main
+        with:
+          source_dir: .
+          build_dir: build
+          checks: bugprone-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*
+          header_filter: .*/include/aw/tpl/.*
+
       - name: Configure & Build Tests with Coverage
         uses: ai-warevo/.github/ci/actions/cmake-build@main
         with:

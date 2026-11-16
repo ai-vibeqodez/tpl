@@ -17,7 +17,8 @@ Maintainer notes (see CLAUDE.md, "Changelog & releases"):
 ### Added
 
 - `CONTRIBUTING.md` with development guidelines, testing requirements, and PR process
-- CI workflows now use composite actions from the catalog repository (`cmake-build`, `ctest-run`, `gcovr-report`, `coverage-parser`, `badge`, `badge-deploy`, `coverage-html-deploy`, `changelog-release`)
+- CI workflows now use composite actions from the catalog repository (`cmake-build`, `ctest-run`, `gcovr-report`, `coverage-parser`, `badge`, `badge-deploy`, `coverage-html-deploy`, `changelog-release`, `clang-tidy`, `clang-format`)
+- `clang-tidy` and `clang-format` composite actions in CI catalog for C++ linting
 - Concurrency control added to CI workflows (`cancel-in-progress` for PRs and branch pushes)
 - `cmake-build` action now supports `install` and `config` inputs for full CMake lifecycle
 
