@@ -45,13 +45,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Configure & Install CMake
+      - name: Configure & Build
         uses: ai-warevo/.github/ci/actions/cmake-build@main
         with:
           source_dir: .
           build_dir: build
           build_type: Release
           extra_args: -DAW_TPL_BUILD_EXAMPLES=ON -DAW_TPL_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=install
+
+      - name: Install CMake Package
+        run: cmake --install build --config Release
 
       - name: Run Examples (Windows)
         if: runner.os == 'Windows'
