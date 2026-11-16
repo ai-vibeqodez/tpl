@@ -10,6 +10,11 @@ on:
 permissions:
   contents: write
 
+# Отменяем старые незавершённые запуски для того же PR / ветки
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   quality-and-tests:
     name: Unit Tests & Coverage
@@ -19,60 +24,43 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install gcovr
-        run: sudo apt-get update && sudo apt-get install -y gcovr
-
       - name: Configure & Build Tests with Coverage
-        env:
-          CC: gcc
-          CXX: g++
-        run: |
-          cmake -B build \
-            -DCMAKE_BUILD_TYPE=Debug \
-            -DAW_TPL_BUILD_EXAMPLES=OFF \
-            -DAW_TPL_BUILD_TESTS=ON \
-            -DAW_TPL_ENABLE_COVERAGE=ON
-          cmake --build build --parallel
+        uses: ai-warevo/.github/ci/actions/cmake-build@main
+        with:
+          source_dir: .
+          build_dir: build
+          build_type: Debug
+          extra_args: -DAW_TPL_BUILD_EXAMPLES=OFF -DAW_TPL_BUILD_TESTS=ON -DAW_TPL_ENABLE_COVERAGE=ON
 
       - name: Run CTest
-        run: ctest --test-dir build -C Debug --output-on-failure
+        uses: ai-warevo/.github/ci/actions/ctest-run@main
+        with:
+          source_dir: .
+          build_dir: build
+          config: Debug
+          output_on_failure: true
 
       - name: Generate Coverage Reports (XML & HTML)
-        run: |
-          mkdir -p htmlcov
-          gcovr -r build/ \
-            --gcov-ignore-errors=no_working_dir_found \
-            --filter "include/aw/tpl/" \
-            --filter "src/" \
-            --exclude "build/_deps/*" \
-            --exclude-unreachable-branches \
-            --exclude-throw-branches \
-            --print-summary \
-            --xml coverage.xml \
-            --html-details htmlcov/index.html
+        uses: ai-warevo/.github/ci/actions/gcovr-report@main
+        with:
+          source_dir: .
+          build_dir: build
+          source_filter: "include/aw/tpl/ src/"
+          exclude: _deps/*
+          output_dir: htmlcov
+          xml_path: coverage.xml
 
       - name: Parse Coverage Metrics
         id: coverage_parser
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        run: |
-          PERCENTAGE=$(python3 -c "import xml.etree.ElementTree as ET; tree = ET.parse('coverage.xml'); root = tree.getroot(); print(int(float(root.attrib['line-rate']) * 100))")
-          echo "DEBUG: Extracted percentage: '$PERCENTAGE'"
-
-          if [ "$PERCENTAGE" -lt 50 ]; then
-            COLOR="#e05d44"
-          elif [ "$PERCENTAGE" -lt 80 ]; then
-            COLOR="#dfb317"
-          else
-            COLOR="#44cc11"
-          fi
-
-          echo "percent=${PERCENTAGE}%" >> $GITHUB_OUTPUT
-          echo "color=${COLOR}" >> $GITHUB_OUTPUT
+        uses: ai-warevo/.github/ci/actions/coverage-parser@main
+        with:
+          xml_path: coverage.xml
 
       - name: Generate Coverage Badge
         id: badge_generator
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        uses: my-repositories/gha/badge@main
+        uses: ai-warevo/.github/ci/actions/badge@main
         with:
           width: '99'
           height: '20'
@@ -81,33 +69,16 @@ jobs:
           bg_color_right: '${{ steps.coverage_parser.outputs.color }}'
           filename: 'coverage.svg'
 
-      - name: Isolate Badge for Deploy
+      - name: Deploy Badge
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        run: |
-          mkdir -p badge-upload
-          cp "${{ steps.badge_generator.outputs.badge_path }}" badge-upload/coverage.svg
-
-      - name: Deploy Badge to separate branch
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        uses: JamesIves/github-pages-deploy-action@v4
+        uses: ai-warevo/.github/ci/actions/badge-deploy@main
         with:
-          branch: badges
-          folder: badge-upload
-          target-folder: .
-          git-config-name: "github-actions[bot]"
-          git-config-email: "github-actions[bot]@users.noreply.github.com"
-          single-commit: true
-
-      - name: Preparation for HTML Deploy
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        run: |
-          touch htmlcov/.nojekyll
+          badge_path: coverage.svg
 
       - name: Deploy Coverage Report to gh-pages
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        uses: JamesIves/github-pages-deploy-action@v4
+        uses: ai-warevo/.github/ci/actions/coverage-html-deploy@main
         with:
-          branch: gh-pages
           folder: htmlcov
 
   sanitizers:
@@ -128,16 +99,17 @@ jobs:
         run: sudo sysctl vm.mmap_rnd_bits=28
 
       - name: Configure & Build
-        env:
-          CC: gcc
-          CXX: g++
-        run: |
-          cmake -B build \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-            -DAW_TPL_BUILD_EXAMPLES=OFF \
-            -DAW_TPL_BUILD_TESTS=ON \
-            -DAW_TPL_SANITIZE=${{ matrix.sanitizer }}
-          cmake --build build --parallel
+        uses: ai-warevo/.github/ci/actions/cmake-build@main
+        with:
+          source_dir: .
+          build_dir: build
+          build_type: RelWithDebInfo
+          extra_args: "-DAW_TPL_BUILD_EXAMPLES=OFF -DAW_TPL_BUILD_TESTS=ON -DAW_TPL_SANITIZE=${{ matrix.sanitizer }}"
 
       - name: Run CTest
-        run: ctest --test-dir build --output-on-failure --timeout 120
+        uses: ai-warevo/.github/ci/actions/ctest-run@main
+        with:
+          source_dir: .
+          build_dir: build
+          output_on_failure: true
+          timeout: 120
