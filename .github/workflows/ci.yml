@@ -57,7 +57,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Get-ChildItem .\build\examples\Release\aw_tpl_example_*.exe | ForEach-Object {
+          Get-ChildItem -Recurse -Filter aw_tpl_example_*.exe | ForEach-Object {
             Write-Host "=== $($_.Name)"
             & $_.FullName
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
