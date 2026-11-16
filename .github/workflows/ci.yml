@@ -54,6 +54,10 @@ jobs:
           build_type: Release
           extra_args: -DAW_TPL_BUILD_EXAMPLES=ON -DAW_TPL_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=install
 
+      - name: Install CMake Package (Unix)
+        if: runner.os != 'Windows'
+        run: cmake --install build
+
       - name: Configure & Build (Windows)
         if: runner.os == 'Windows'
         env:
