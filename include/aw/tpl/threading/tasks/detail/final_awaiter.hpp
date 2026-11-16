@@ -21,8 +21,8 @@ namespace aw::tpl::threading::tasks::detail {
 struct FinalAwaiter {
     std::shared_ptr<TaskStateBase> st; ///< The promise's own reference, moved out in final_suspend().
 
-    bool await_ready() const noexcept { return false; }
-    std::coroutine_handle<> await_suspend(std::coroutine_handle<> h) noexcept;
+    [[nodiscard]] bool await_ready() const noexcept { return false; }
+    [[nodiscard]] std::coroutine_handle<> await_suspend(std::coroutine_handle<> h) noexcept;
     void await_resume() const noexcept {} // LCOV_EXCL_LINE: the frame is never resumed after final suspend
 };
 

@@ -29,19 +29,19 @@ void CancellationState::cancel() {
 
 std::uint64_t CancellationState::register_callback(std::function<void()> cb) {
     std::uint64_t id = 0;
-    bool run_now = false;
+    std::function<void()> immediate_cb;
     {
         std::lock_guard lock(mtx);
         if (canceled.load(std::memory_order_acquire)) {
-            run_now = true;
+            immediate_cb = std::move(cb);
         } else {
             id = next_id++;
             callbacks.emplace_back(id, std::move(cb));
         }
     }
     // An exception from an immediately executed callback propagates to the caller.
-    if (run_now && cb) {
-        cb();
+    if (immediate_cb) {
+        immediate_cb();
     }
     return id;
 }

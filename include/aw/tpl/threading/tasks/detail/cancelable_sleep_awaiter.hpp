@@ -16,7 +16,7 @@ struct CancelableSleepAwaiter {
     std::chrono::milliseconds duration;
     CancellationToken token;
 
-    bool await_ready() const;
+    [[nodiscard]] bool await_ready() const;
     void await_suspend(std::coroutine_handle<> h) const;
     void await_resume() const;
 };

@@ -12,7 +12,7 @@ namespace aw::tpl::threading::detail {
 struct DelayAwaiter {
     std::chrono::milliseconds duration;
 
-    bool await_ready() const noexcept { return duration.count() <= 0; }
+    [[nodiscard]] bool await_ready() const noexcept { return duration.count() <= 0; }
     void await_suspend(std::coroutine_handle<> h) const;
     void await_resume() const noexcept {}
 };

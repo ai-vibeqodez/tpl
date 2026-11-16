@@ -71,7 +71,7 @@ auto when_all(Task<Ts>... tasks) {
     } else {
         // The helper never throws: it records either the value or the exception, so awaiting one
         // child can never abandon the others.
-        auto settle = []<typename T>(Task<T>& t) -> Task<detail::WhenAllSettled<T>> {
+        auto settle = []<typename T>(Task<T> t) -> Task<detail::WhenAllSettled<T>> {
             detail::WhenAllSettled<T> outcome;
             try {
                 if constexpr (std::is_void_v<T>) {

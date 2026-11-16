@@ -15,9 +15,9 @@ namespace aw::tpl::threading::tasks::detail {
 struct WhenAnyAwaiter {
     std::shared_ptr<WhenAnyState> state;
 
-    bool await_ready() const noexcept;
+    [[nodiscard]] bool await_ready() const noexcept;
     std::coroutine_handle<> await_suspend(std::coroutine_handle<> h);
-    std::size_t await_resume() const noexcept;
+    [[nodiscard]] std::size_t await_resume() const noexcept;
 };
 
 } // namespace aw::tpl::threading::tasks::detail

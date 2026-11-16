@@ -15,8 +15,8 @@ namespace aw::tpl::threading::tasks::detail {
 struct CompletionAwaiter {
     std::shared_ptr<TaskStateBase> state;
 
-    bool await_ready() const;
-    std::coroutine_handle<> await_suspend(std::coroutine_handle<> awaiting) const;
+    [[nodiscard]] bool await_ready() const;
+    [[nodiscard]] std::coroutine_handle<> await_suspend(std::coroutine_handle<> awaiting) const;
     void await_resume() const noexcept {}
 };
 

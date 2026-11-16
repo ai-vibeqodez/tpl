@@ -46,7 +46,7 @@ Task<Task<T>> when_any(std::vector<Task<T>> tasks) {
         detail::spawn_when_any_watcher(tasks[i].completion(), i, state);
     }
 
-    std::size_t winner = co_await detail::WhenAnyAwaiter{state};
+    const std::size_t winner = co_await detail::WhenAnyAwaiter{state};
     co_return tasks[winner];
 }
 
@@ -67,12 +67,12 @@ Task<Task<T>> when_any(std::vector<Task<T>> tasks) {
  */
 template <typename... Ts>
     requires(sizeof...(Ts) > 0)
-auto when_any(Task<Ts>... tasks) {
+auto when_any(const Task<Ts>&... tasks) {
     using First = std::tuple_element_t<0, std::tuple<Ts...>>;
     if constexpr ((std::is_same_v<Ts, First> && ...)) {
         std::vector<Task<First>> vec;
         vec.reserve(sizeof...(Ts));
-        (vec.push_back(std::move(tasks)), ...);
+        (vec.push_back(Task<First>(tasks)), ...);
         return when_any(std::move(vec));
     } else {
         // Different result types: view every task as the non-generic Task<void> (shared state).

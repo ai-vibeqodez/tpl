@@ -63,7 +63,7 @@ public:
      * @brief Checks whether the task has already finished without suspending.
      * @return True if result is already available.
      */
-    bool await_ready() const { return !state_ || state_->is_ready(); }
+    [[nodiscard]] bool await_ready() const { return !state_ || state_->is_ready(); }
 
     /**
      * @brief Suspends the caller until this task finishes using C++20 symmetric transfer,
@@ -73,7 +73,7 @@ public:
      * @note Not noexcept: attaching the continuation locks a mutex and may allocate.
      *       Only reached when @c await_ready() returned false, i.e. the task has a state.
      */
-    std::coroutine_handle<> await_suspend(std::coroutine_handle<> awaiting) {
+    [[nodiscard]] std::coroutine_handle<> await_suspend(std::coroutine_handle<> awaiting) {
         return state_->suspend_or_resume(awaiting);
     }
 
@@ -83,7 +83,7 @@ public:
      * @throws TaskAlreadyMovedException If a move-only result was already extracted.
      * @throws Any exception thrown inside the coroutine body.
      */
-    T await_resume() const {
+    [[nodiscard]] T await_resume() const {
         require_state();
         if (state_->exception) {
             std::rethrow_exception(state_->exception);
@@ -112,7 +112,7 @@ public:
      * @throws TaskAlreadyMovedException If a move-only result was already taken.
      * @throws Any exception thrown inside the coroutine body.
      */
-    T result() const {
+    [[nodiscard]] T result() const {
         require_state();
         state_->wait_blocking();
         return await_resume();

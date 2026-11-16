@@ -1,24 +1,86 @@
-# Opt-in tool for local use (not run in CI). Needs compile_commands.json: configure with CMake first.
-#   clang-tidy -p build/dev src/threading/thread_pool.cpp
-Checks: >
-  -*,
-  bugprone-*,
-  cppcoreguidelines-avoid-capturing-lambda-coroutines,
-  cppcoreguidelines-avoid-reference-coroutine-parameters,
-  cppcoreguidelines-missing-std-forward,
-  cppcoreguidelines-slicing,
-  misc-const-correctness,
-  misc-definitions-in-headers,
-  misc-unused-using-decls,
-  modernize-use-nodiscard,
-  modernize-use-override,
-  modernize-use-using,
-  performance-*,
-  readability-container-size-empty,
-  readability-redundant-member-init,
-  -bugprone-easily-swappable-parameters,
-  -bugprone-exception-escape,
-  -bugprone-unchecked-optional-access
+# clang-tidy configuration for aw::tpl (C++20, header + source files)
+# Approach: * (all checks) minus exclusions — similar to nlohmann/json.
+# This catches new bugs automatically as LLVM adds new checks.
+#
+# Run locally: clang-tidy -p build/dev <file>
+# CI uses the narrow set in .github/workflows/ci.yml for speed.
+
+# YAML list format: each item is processed in order.
+# -*  → disable all checks
+# *   → enable all checks
+# -check → disable specific checks (must come after *)
+Checks:
+  - '-*'
+  - '*'
+  # --- Bug detection (critical for concurrent library) ---
+  - 'bugprone-*'
+  - 'cppcoreguidelines-avoid-capturing-lambda-coroutines'
+  - 'cppcoreguidelines-avoid-reference-coroutine-parameters'
+  - 'cppcoreguidelines-missing-std-forward'
+  - 'cppcoreguidelines-slicing'
+  # --- Modern C++ ---
+  - 'modernize-use-nodiscard'
+  - 'modernize-use-override'
+  - 'modernize-use-using'
+  # --- Performance ---
+  - 'performance-*'
+  # --- Readability ---
+  - 'readability-container-size-empty'
+  - 'readability-redundant-member-init'
+  # --- Exclusions: noise for header-only / library code ---
+  # Variadic templates trigger false positives
+  - '-bugprone-easily-swappable-parameters'
+  # Not applicable to C++ RAII patterns
+  - '-bugprone-exception-escape'
+  # False positives on std::optional
+  - '-bugprone-unchecked-optional-access'
+  # --- Exclusions: not applicable to our project ---
+  # libc certification checks (we are not a libc implementation)
+  - '-llvmlibc-*'
+  # CERT certification (too strict for a library)
+  - '-cert-*'
+  # Include cleaner: false positives on transitive includes
+  - '-misc-include-cleaner'
+  # Trailing return type: we prefer explicit return types for readability
+  - '-modernize-use-trailing-return-type'
+  # Identifier length: h, st, hw, cb, id are standard abbreviations
+  - '-readability-identifier-length'
+  # Non-const global: thread_local is intentional for pool context
+  - '-cppcoreguidelines-avoid-non-const-global-variables'
+  # Internal linkage: public API functions must be externally visible
+  - '-misc-use-internal-linkage'
+  # Special member functions: delete copy + non-default dtor = no move (intentional for RAII)
+  - '-cppcoreguidelines-special-member-functions'
+  - '-hicpp-special-member-functions'
+  # Style: braces, named params (we use short one-line ifs)
+  - '-hicpp-braces-around-statements'
+  - '-google-readability-braces-around-statements'
+  - '-readability-braces-around-statements'
+  - '-hicpp-named-parameter'
+  - '-readability-named-parameter'
+  # Altera / Fuchsia specific (embedded / OS checks, not applicable)
+  - '-altera-*'
+  - '-fuchsia-*'
+  # Header guard: we use #pragma once
+  - '-llvm-header-guard'
+  # Non-private member variables: detail structs have public fields by design
+  - '-misc-non-private-member-variables-in-classes'
+  # Const-correctness: false positives on lock_guard / scoped_lock (can't be const)
+  - '-misc-const-correctness'
+  # Overloading operators: > for min-heap is intentional
+  - '-fuchsia-overloaded-operator'
+  # Kernel unroll: not applicable to user-space C++
+  - '-altera-unroll-loops'
+  # Member functions: static suggestion is noise on awaiter structs
+  - '-readability-convert-member-functions-to-static'
+  # Include order: we use explicit grouping (own header, aw/, then <std>)
+  - '-llvm-include-order'
+  # Explicit conversions: we allow implicit upcast like C# (Task<T> → Task<void>)
+  - '-hicpp-explicit-conversions'
+  - '-google-explicit-constructor'
+  # Cognitive complexity: when_all is inherently complex (32 vs threshold 25)
+  - '-readability-function-cognitive-complexity'
+
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*/include/aw/tpl/.*'
 FormatStyle: file

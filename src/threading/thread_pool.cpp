@@ -78,10 +78,10 @@ ThreadPool::ThreadPool(std::size_t thread_count)
 
     workers_.reserve(thread_count);
     for (std::size_t i = 0; i < thread_count; ++i) {
-        workers_.emplace_back([this](std::stop_token st) { worker_loop(st); });
+        workers_.emplace_back([this](const std::stop_token& st) { worker_loop(st); });
     }
 
-    timer_thread_ = std::jthread([this](std::stop_token st) { timer_loop(st); });
+    timer_thread_ = std::jthread([this](const std::stop_token& st) { timer_loop(st); });
 }
 
 ThreadPool::ThreadPool(NoThreads) noexcept {}

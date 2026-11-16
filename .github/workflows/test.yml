@@ -43,8 +43,6 @@ jobs:
         with:
           source_dir: .
           build_dir: build
-          checks: bugprone-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*
-          header_filter: .*/include/aw/tpl/.*
 
       - name: Run CTest
         uses: ai-warevo/.github/ci/actions/ctest-run@main

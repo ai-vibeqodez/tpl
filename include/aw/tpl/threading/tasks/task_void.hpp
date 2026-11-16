@@ -69,7 +69,7 @@ public:
     }
 
     /// Checks whether the task has already finished without suspending.
-    bool await_ready() const;
+    [[nodiscard]] bool await_ready() const;
 
     /**
      * @brief Suspends the caller until this task finishes using C++20 symmetric transfer,
@@ -77,7 +77,7 @@ public:
      * @note Not noexcept: attaching the continuation locks a mutex and may allocate.
      *       Only reached when @c await_ready() returned false, i.e. the task has a state.
      */
-    std::coroutine_handle<> await_suspend(std::coroutine_handle<> awaiting);
+    [[nodiscard]] std::coroutine_handle<> await_suspend(std::coroutine_handle<> awaiting);
 
     /**
      * @brief Rethrows any captured exception (called by @c co_await).
