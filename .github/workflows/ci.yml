@@ -45,7 +45,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Configure & Build
+      - name: Configure & Build (Unix)
+        if: runner.os != 'Windows'
         uses: ai-warevo/.github/ci/actions/cmake-build@main
         with:
           source_dir: .
@@ -53,8 +54,15 @@ jobs:
           build_type: Release
           extra_args: -DAW_TPL_BUILD_EXAMPLES=ON -DAW_TPL_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=install
 
-      - name: Install CMake Package
-        run: cmake --install build --config Release
+      - name: Configure & Build (Windows)
+        if: runner.os == 'Windows'
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DAW_TPL_BUILD_EXAMPLES=ON -DAW_TPL_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=install
+          cmake --build build --config Release --parallel
+          cmake --install build --config Release
 
       - name: Run Examples (Windows)
         if: runner.os == 'Windows'
