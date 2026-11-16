@@ -19,11 +19,15 @@ Maintainer notes (see CLAUDE.md, "Changelog & releases"):
 - `CONTRIBUTING.md` with development guidelines, testing requirements, and PR process
 - CI workflows now use composite actions from the catalog repository (`cmake-build`, `ctest-run`, `gcovr-report`, `coverage-parser`, `badge`, `badge-deploy`, `coverage-html-deploy`, `changelog-release`)
 - Concurrency control added to CI workflows (`cancel-in-progress` for PRs and branch pushes)
+- `cmake-build` action now supports `install` and `config` inputs for full CMake lifecycle
 
 ### Changed
 
 - Workflow steps refactored to use reusable composite actions instead of inline scripts
 - Release job now uses `changelog-release` composite action for CHANGELOG parsing
+- `test.yml`: replaced inline configure+build with `cmake-build` composite action
+- `ci.yml`: unified Windows and Unix build steps into single `cmake-build` call
+- Removed unused `packages: write` permission from `test.yml`
 
 ## [3.0.0] - 2026-11-14
 
