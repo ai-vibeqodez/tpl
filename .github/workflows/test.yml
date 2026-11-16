@@ -9,7 +9,6 @@ on:
 
 permissions:
   contents: write
-  packages: write
 
 # Отменяем старые незавершённые запуски для того же PR / ветки
 concurrency:
@@ -26,16 +25,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Configure & Build Tests with Coverage
-        env:
-          CC: gcc
-          CXX: g++
-        run: |
-          cmake -B build \
-            -DCMAKE_BUILD_TYPE=Debug \
-            -DAW_TPL_BUILD_EXAMPLES=OFF \
-            -DAW_TPL_BUILD_TESTS=ON \
-            -DAW_TPL_ENABLE_COVERAGE=ON
-          cmake --build build --parallel
+        uses: ai-warevo/.github/ci/actions/cmake-build@main
+        with:
+          source_dir: .
+          build_dir: build
+          build_type: Debug
+          extra_args: -DAW_TPL_BUILD_EXAMPLES=OFF -DAW_TPL_BUILD_TESTS=ON -DAW_TPL_ENABLE_COVERAGE=ON
 
       - name: Run CTest
         uses: ai-warevo/.github/ci/actions/ctest-run@main
