@@ -14,6 +14,17 @@ Maintainer notes (see CLAUDE.md, "Changelog & releases"):
 
 ## [Unreleased]
 
+### Added
+
+- `CONTRIBUTING.md` with development guidelines, testing requirements, and PR process
+- CI workflows now use composite actions from the catalog repository (`cmake-build`, `ctest-run`, `gcovr-report`, `coverage-parser`, `badge`, `badge-deploy`, `coverage-html-deploy`, `changelog-release`)
+- Concurrency control added to CI workflows (`cancel-in-progress` for PRs and branch pushes)
+
+### Changed
+
+- Workflow steps refactored to use reusable composite actions instead of inline scripts
+- Release job now uses `changelog-release` composite action for CHANGELOG parsing
+
 ## [3.0.0] - 2026-11-14
 
 ### Breaking

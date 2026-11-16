@@ -179,3 +179,7 @@ Per **C++ Core Guidelines (CP.51)**, avoid invoking capturing coroutine lambdas 
 ## 📄 License
 
 Distributed under the MIT License. See [`LICENSE`](LICENSE) for more information.
+
+## 🤝 Contributing
+
+We welcome contributions! Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) for development guidelines, testing requirements, and the pull request process.
