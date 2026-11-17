@@ -3,6 +3,9 @@
 #   sanitizers  ASan+UBSan and TSan, full suite
 #   stress      30x the concurrency tests in optimized builds (different timing, different races)
 #   coverage    gcc --coverage -> gcovr; the badge/report are published only from main
+#
+# All jobs run inside ghcr.io/ai-warevo/ci-cpp20 (gcc-15, clang-18, cmake, ninja, gcovr).
+# Coverage deploy actions still run on ubuntu-latest (they only push badges, no toolchain).
 
 name: Test
 
@@ -20,53 +23,53 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  IMAGE: ghcr.io/ai-warevo/ci-cpp20
+
 jobs:
   lint:
     name: Lint (clang-format, clang-tidy)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ env.IMAGE }}
+      options: --user root
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install toolchain + tools
-        id: tc
-        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
-        with:
-          toolchain: clang18-libcxx
-          tools: 'true'
+      - name: Verify toolchain
+        run: |
+          clang++-18 --version | head -1
+          clang-format --version | head -1
+          clang-tidy --version | head -1
 
-      # The action ANDs its -name filters, so `extensions: cpp,hpp` would match no file at all: one step per extension.
       - name: clang-format (.hpp)
-        uses: ai-warevo/.github/ci/actions/clang-format@main
-        with:
-          source_dir: .
-          extensions: hpp
-      - name: clang-format (.cpp)
-        uses: ai-warevo/.github/ci/actions/clang-format@main
-        with:
-          source_dir: .
-          extensions: cpp
+        run: |
+          find include src tests -name '*.hpp' 2>/dev/null | xargs clang-format --dry-run -Werror
 
-      # Configure + build: clang-tidy needs compile_commands.json and the fetched dependencies.
+      - name: clang-format (.cpp)
+        run: |
+          find include src tests -name '*.cpp' 2>/dev/null | xargs clang-format --dry-run -Werror
+
       - name: Configure & Build
-        uses: ai-warevo/.github/ci/actions/cmake-build@main
-        with:
-          source_dir: .
-          build_dir: build
-          build_type: Debug
-          extra_args: >-
-            ${{ steps.tc.outputs.cmake_args }}
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_COMPILER=clang++-18 \
+            -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
             -DAW_TPL_BUILD_TESTS=ON
 
       - name: Run clang-tidy
-        uses: ai-warevo/.github/ci/actions/clang-tidy@main
-        with:
-          source_dir: .
-          build_dir: build
+        run: |
+          find include src -name '*.hpp' -o -name '*.cpp' | \
+            xargs clang-tidy -p build --checks='*'
 
   sanitizers:
     name: ${{ matrix.name }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ env.IMAGE }}
+      options: --user root
     # The distro libc++/libc++abi are not ASan-instrumented: they allocate exception messages with the (intercepted)
     # operator new but release them with plain free(), which ASan reports as alloc-dealloc-mismatch on every
     # thrown std::runtime_error/logic_error. A toolchain false positive, not a tpl bug.
@@ -79,54 +82,55 @@ jobs:
           - name: ASan + UBSan (clang-18, libc++)
             toolchain: clang18-libcxx
             sanitizer: address
+            stdlib: libc++
           # TSan uses libstdc++: libc++'s shared_ptr/atomic internals are not TSan-instrumented in the distro package,
           # which would report false races on the very reference counts this library relies on.
           - name: TSan (clang-18, libstdc++)
             toolchain: clang18-libstdcxx
             sanitizer: thread
+            stdlib: libstdc++
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install toolchain
-        id: tc
-        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
-        with:
-          toolchain: ${{ matrix.toolchain }}
-          sanitizer_runtime: 'true'
-
       # TSan maps shadow memory at fixed addresses; recent kernels' ASLR range makes it abort at startup.
       - name: Relax ASLR for ThreadSanitizer
         if: matrix.sanitizer == 'thread'
-        run: sudo sysctl vm.mmap_rnd_bits=28
+        run: sysctl vm.mmap_rnd_bits=28
 
       # AW_TPL_SANITIZE adds PUBLIC compile/link flags to aw::tpl, so the tests are instrumented as well.
       - name: Configure & Build
-        uses: ai-warevo/.github/ci/actions/cmake-build@main
-        with:
-          source_dir: .
-          build_dir: build
-          build_type: RelWithDebInfo
-          extra_args: >-
-            ${{ steps.tc.outputs.cmake_args }}
-            -DAW_TPL_BUILD_EXAMPLES=OFF
-            -DAW_TPL_BUILD_EXAMPLES=OFF
-            -DAW_TPL_BUILD_TESTS=ON
-            -DAW_TPL_SANITIZE=${{ matrix.sanitizer }}
+        run: |
+          if [ "${{ matrix.stdlib }}" = "libc++" ]; then
+            cmake -B build -G Ninja \
+              -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+              -DCMAKE_CXX_COMPILER=clang++-18 \
+              -DCMAKE_CXX_FLAGS="-stdlib=libc++ -fexperimental-library" \
+              -DAW_TPL_BUILD_EXAMPLES=OFF \
+              -DAW_TPL_BUILD_TESTS=ON \
+              -DAW_TPL_SANITIZE=${{ matrix.sanitizer }}
+          else
+            cmake -B build -G Ninja \
+              -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+              -DCMAKE_CXX_COMPILER=clang++-18 \
+              -DCMAKE_CXX_FLAGS="-stdlib=${{ matrix.stdlib }}" \
+              -DAW_TPL_BUILD_EXAMPLES=OFF \
+              -DAW_TPL_BUILD_TESTS=ON \
+              -DAW_TPL_SANITIZE=${{ matrix.sanitizer }}
+          fi
+          cmake --build build --parallel
 
       - name: Run Tests
-        uses: ai-warevo/.github/ci/actions/ctest-run@main
-        with:
-          source_dir: .
-          build_dir: build
-          config: RelWithDebInfo
-          output_on_failure: true
-          timeout: 300
+        working-directory: build
+        run: ctest --output-on-failure --timeout 300
 
   stress:
     name: Repeat concurrency tests 30x (${{ matrix.toolchain }}, Release)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ env.IMAGE }}
+      options: --user root
     strategy:
       fail-fast: false
       matrix:
@@ -136,19 +140,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install toolchain
-        id: tc
-        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
-        with:
-          toolchain: ${{ matrix.toolchain }}
-
       - name: Configure & Build
-        uses: ai-warevo/.github/ci/actions/cmake-build@main
-        with:
-          source_dir: .
-          build_dir: build
-          build_type: Release
-          extra_args: ${{ steps.tc.outputs.cmake_args }}
+        run: |
+          if [ "${{ matrix.toolchain }}" = "clang18-libcxx" ]; then
+            cmake -B build -G Ninja \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_CXX_COMPILER=clang++-18 \
+              -DCMAKE_CXX_FLAGS="-stdlib=libc++ -fexperimental-library"
+          else
+            cmake -B build -G Ninja \
+              -DCMAKE_BUILD_TYPE=Release
+          fi
+          cmake --build build --parallel
 
       # `until-fail:30` = run up to 30 times and stop at the first failure.
       - name: Repeat the concurrency tests
@@ -157,7 +160,10 @@ jobs:
 
   coverage:
     name: Coverage
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ env.IMAGE }}
+      options: --user root
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -165,59 +171,64 @@ jobs:
       # The distro g++ (13): gcovr pins the `gcov` matching the default gcc, so build with that same compiler.
       # AW_TPL_ENABLE_COVERAGE adds PUBLIC --coverage flags to aw::tpl, which instruments the tests too.
       - name: Configure & Build
-        uses: ai-warevo/.github/ci/actions/cmake-build@main
-        with:
-          source_dir: .
-          build_dir: build
-          build_type: Debug
-          extra_args: -DAW_TPL_ENABLE_COVERAGE=ON
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DAW_TPL_ENABLE_COVERAGE=ON
+          cmake --build build --parallel
 
       - name: Run Tests
-        uses: ai-warevo/.github/ci/actions/ctest-run@main
-        with:
-          source_dir: .
-          build_dir: build
-          config: Debug
-          output_on_failure: true
-          timeout: 300
+        working-directory: build
+        run: ctest --output-on-failure --timeout 300
 
       - name: Generate Coverage Reports (XML & HTML)
-        uses: ai-warevo/.github/ci/actions/gcovr-report@main
-        with:
-          source_dir: .
-          build_dir: build
-          source_filter: "include/aw/tpl/ src/"
-          exclude: _deps/*
-          output_dir: htmlcov
-          xml_path: coverage.xml
+        run: |
+          gcovr --xml-output coverage.xml \
+            --root . \
+            --source-filter 'include/aw/tpl/|src/' \
+            --exclude '_deps/*' \
+            -r . \
+            build
+          gcovr --html --html-details -o coverage.html \
+            --root . \
+            --source-filter 'include/aw/tpl/|src/' \
+            --exclude '_deps/*' \
+            -r . \
+            build
+          mkdir -p htmlcov
+          cp coverage.html htmlcov/
 
       - name: Parse Coverage Metrics
         id: coverage_parser
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        uses: ai-warevo/.github/ci/actions/coverage-parser@main
-        with:
-          xml_path: coverage.xml
+        run: |
+          pct=$(gcovr --print-summary --root . --exclude '_deps/*' build 2>&1 | grep 'LINE:' | awk '{print $3}' | tr -d '%')
+          echo "percent=${pct}" >> "$GITHUB_OUTPUT"
+          if [ "${pct%.*}" -ge 80 ] 2>/dev/null; then
+            color="brightgreen"
+          elif [ "${pct%.*}" -ge 50 ] 2>/dev/null; then
+            color="yellow"
+          else
+            color="red"
+          fi
+          echo "color=${color}" >> "$GITHUB_OUTPUT"
 
       - name: Generate Coverage Badge
         id: badge_generator
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        uses: ai-warevo/.github/ci/actions/badge@main
+        uses: schneegans/dynamic-badges-action@v1
         with:
-          width: '99'
-          height: '20'
-          text_left: 'coverage'
-          text_right: '${{ steps.coverage_parser.outputs.percent }}'
-          bg_color_right: '${{ steps.coverage_parser.outputs.color }}'
-          filename: 'coverage.svg'
-
-      - name: Deploy Badge
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        uses: ai-warevo/.github/ci/actions/badge-deploy@main
-        with:
-          badge_path: coverage.svg
+          gistid: ${{ secrets.BADGE_GIST_ID }}
+          token: ${{ secrets.BADGE_GIST_TOKEN }}
+          filename: tpl-coverage.json
+          label: coverage
+          message: ${{ steps.coverage_parser.outputs.percent }}%
+          color: ${{ steps.coverage_parser.outputs.color }}
 
       - name: Deploy Coverage Report to gh-pages
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        uses: ai-warevo/.github/ci/actions/coverage-html-deploy@main
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          folder: htmlcov
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./htmlcov
+          keep_files: true
