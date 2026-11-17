@@ -70,6 +70,7 @@ add_library(aw_tpl STATIC
     src/threading/detail/delay_awaiter.cpp
     src/threading/tasks/async_sleep.cpp
     src/threading/tasks/task_already_moved_exception.cpp
+    src/threading/tasks/task_group.cpp
     src/threading/tasks/task_void.cpp
     src/threading/tasks/detail/cancelable_sleep_awaiter.cpp
     src/threading/tasks/detail/completion_awaiter.cpp
@@ -111,9 +112,11 @@ target_sources(aw_tpl
             include/aw/tpl/threading/detail/pool_scheduling.hpp
             include/aw/tpl/threading/detail/timer_entry.hpp
             include/aw/tpl/threading/tasks/async_sleep.hpp
+            include/aw/tpl/threading/tasks/spawn.hpp
             include/aw/tpl/threading/tasks/task.hpp
             include/aw/tpl/threading/tasks/task_already_moved_exception.hpp
             include/aw/tpl/threading/tasks/task_fwd.hpp
+            include/aw/tpl/threading/tasks/task_group.hpp
             include/aw/tpl/threading/tasks/task_void.hpp
             include/aw/tpl/threading/tasks/when_all.hpp
             include/aw/tpl/threading/tasks/when_any.hpp
@@ -126,7 +129,9 @@ target_sources(aw_tpl
             include/aw/tpl/threading/tasks/detail/promise_base.hpp
             include/aw/tpl/threading/tasks/detail/promise_void.hpp
             include/aw/tpl/threading/tasks/detail/run_async.hpp
+            include/aw/tpl/threading/tasks/detail/spawn_guard.hpp
             include/aw/tpl/threading/tasks/detail/task_state.hpp
+            include/aw/tpl/threading/tasks/detail/task_group_awaiter.hpp
             include/aw/tpl/threading/tasks/detail/task_state_base.hpp
             include/aw/tpl/threading/tasks/detail/when_all_element.hpp
             include/aw/tpl/threading/tasks/detail/when_all_settled.hpp

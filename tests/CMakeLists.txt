@@ -15,6 +15,8 @@ add_executable(aw_tpl_tests
     test_when_all.cpp
     test_when_any.cpp
     test_cancellation.cpp
+    test_task_group.cpp
+    test_spawn.cpp
 )
 
 target_link_libraries(aw_tpl_tests PRIVATE

@@ -7,6 +7,7 @@ set(AW_TPL_EXAMPLES
     05_cancellation
     06_thread_pool
     07_timeout
+    08_co_spawn
 )
 
 foreach(example IN LISTS AW_TPL_EXAMPLES)

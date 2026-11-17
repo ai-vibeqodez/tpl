@@ -158,6 +158,7 @@ Every part of the public API is shown in [`examples/`](examples):
 | [`05_cancellation.cpp`](examples/05_cancellation.cpp) | `CancellationTokenSource`, tokens, callbacks, `cancel_after`, `async_sleep` |
 | [`06_thread_pool.cpp`](examples/06_thread_pool.cpp) | `ThreadPool::global`, `set_default_threads`, private pools, blocking guard |
 | [`07_timeout.cpp`](examples/07_timeout.cpp) | `CancellationTokenSource(timeout)`, `OperationCanceledException` → `TimeoutException` |
+| [`08_co_spawn.cpp`](examples/08_co_spawn.cpp) | `co_spawn` fire-and-forget, error handler, `TaskGroup` draining |
 
 ## ⚠️ C++20 Coroutine Lifetime Note
 

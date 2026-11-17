@@ -16,6 +16,9 @@ Maintainer notes (see CLAUDE.md, "Changelog & releases"):
 
 ### Added
 
+- `co_spawn(Task<T>)`, `co_spawn(Task<T>, ErrorHandler)` and `co_spawn(TaskGroup&, Task<T>, ErrorHandler)`: explicit fire-and-forget with optional error reporting and drain tracking.
+- `TaskGroup` (`add()`/`done()`/`wait()`/`wait_async()`/`pending()`): counter of in-flight operations that can be drained.
+- Example `08_co_spawn`.
 - `CONTRIBUTING.md` with development guidelines, testing requirements, and PR process
 - CI workflows now use composite actions from the catalog repository (`cmake-build`, `ctest-run`, `gcovr-report`, `coverage-parser`, `badge`, `badge-deploy`, `coverage-html-deploy`, `changelog-release`, `clang-tidy`, `clang-format`)
 - `clang-tidy` and `clang-format` composite actions in CI catalog for C++ linting

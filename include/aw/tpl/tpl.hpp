@@ -21,5 +21,7 @@
 #include <aw/tpl/threading/tasks/task.hpp>
 #include <aw/tpl/threading/tasks/task_already_moved_exception.hpp>
 #include <aw/tpl/threading/tasks/async_sleep.hpp>
+#include <aw/tpl/threading/tasks/spawn.hpp>
+#include <aw/tpl/threading/tasks/task_group.hpp>
 #include <aw/tpl/threading/tasks/when_all.hpp>
 #include <aw/tpl/threading/tasks/when_any.hpp>
