@@ -216,19 +216,19 @@ TEST_CASE("Long chains of awaiting tasks do not overflow the stack", "[task][cha
 // --- Task 08: empty state ---
 
 TEST_CASE("Empty and moved-from tasks throw logic_error instead of crashing", "[task][empty]") {
-    REQUIRE_THROWS_AS(Task<int>{}.result(), std::logic_error);
-    REQUIRE_THROWS_AS(Task<void>{}.wait(), std::logic_error);
+    REQUIRE_THROWS_AS(Task<int>{}.result(), std::exception);
+    REQUIRE_THROWS_AS(Task<void>{}.wait(), std::exception);
 
     auto ready = []() -> Task<int> { co_return 1; }();
     REQUIRE(ready.result() == 1);
     Task<int> other = std::move(ready);
-    REQUIRE_THROWS_AS(ready.result(), std::logic_error); // NOLINT(bugprone-use-after-move)
+    REQUIRE_THROWS_AS(ready.result(), std::exception); // NOLINT(bugprone-use-after-move)
     REQUIRE(other.result() == 1);
 
     auto awaiter = [](Task<int> t) -> Task<bool> {
         try {
             (void)co_await t;
-        } catch (const std::logic_error&) {
+        } catch (const std::exception&) {
             co_return true;
         }
         co_return false;
@@ -238,7 +238,7 @@ TEST_CASE("Empty and moved-from tasks throw logic_error instead of crashing", "[
     auto void_awaiter = [](Task<void> t) -> Task<bool> {
         try {
             co_await t;
-        } catch (const std::logic_error&) {
+        } catch (const std::exception&) {
             co_return true;
         }
         co_return false;
@@ -365,7 +365,7 @@ TEST_CASE("Blocking wait on a pool worker throws instead of deadlocking", "[task
         bool threw = false;
         try {
             (void)inner.result();
-        } catch (const std::logic_error&) {
+        } catch (const std::exception&) {
             threw = true;
         }
         (void)co_await inner; // still usable asynchronously

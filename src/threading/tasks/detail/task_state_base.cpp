@@ -1,13 +1,12 @@
 #include <aw/tpl/threading/tasks/detail/task_state_base.hpp>
+#include <aw/tpl/threading/tasks/detail/task_stateless_exception.hpp>
 
 #include <aw/tpl/threading/detail/pool_scheduling.hpp>
-
-#include <stdexcept>
 
 namespace aw::tpl::threading::tasks::detail {
 
 void throw_task_has_no_state() {
-    throw std::logic_error("Task has no shared state (default-constructed or moved-from).");
+    throw task_stateless_exception{};
 }
 
 TaskStateBase::~TaskStateBase() {

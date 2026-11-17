@@ -9,7 +9,7 @@
 namespace aw::tpl::threading::tasks::detail {
 
 /**
- * @brief Throws @c std::logic_error: the task has no shared state (default-constructed or moved-from).
+ * @brief Throws @c detail::task_stateless_exception: the task has no shared state (default-constructed or moved-from).
  */
 [[noreturn]] void throw_task_has_no_state();
 

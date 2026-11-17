@@ -3,6 +3,10 @@
 namespace aw::tpl {
 
 OperationCanceledException::OperationCanceledException()
-    : std::runtime_error("Operation was canceled.") {}
+    : message_("Operation was canceled.") {}
+
+const char* OperationCanceledException::what() const noexcept {
+    return message_.c_str();
+}
 
 } // namespace aw::tpl

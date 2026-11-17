@@ -81,7 +81,7 @@ public:
 
     /**
      * @brief Rethrows any captured exception (called by @c co_await).
-     * @throws std::logic_error If the task has no shared state (default-constructed or moved-from).
+     * @throws detail::task_stateless_exception If the task has no shared state (default-constructed or moved-from).
      * @throws Any exception thrown inside the coroutine body.
      */
     void await_resume() const;

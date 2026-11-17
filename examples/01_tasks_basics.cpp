@@ -70,11 +70,11 @@ int main() {
         std::cout << "second take throws: " << ex.what() << "\n";
     }
 
-    // A default-constructed (or moved-from) Task has no state and throws std::logic_error.
+    // A default-constructed (or moved-from) Task has no state and throws std::exception.
     Task<int> empty;
     try {
         (void)empty.result();
-    } catch (const std::logic_error& ex) {
+    } catch (const std::exception& ex) {
         std::cout << "empty task: " << ex.what() << "\n";
     }
     return 0;

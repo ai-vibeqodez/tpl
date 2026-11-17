@@ -3,6 +3,10 @@
 namespace aw::tpl::threading::tasks {
 
 TaskAlreadyMovedException::TaskAlreadyMovedException()
-    : std::logic_error("Task move-only value has already been moved out via co_await or result().") {}
+    : message_("Task move-only value has already been moved out via co_await or result().") {}
+
+const char* TaskAlreadyMovedException::what() const noexcept {
+    return message_.c_str();
+}
 
 } // namespace aw::tpl::threading::tasks

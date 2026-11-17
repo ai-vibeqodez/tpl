@@ -79,7 +79,7 @@ public:
 
     /**
      * @brief Returns the task's result or rethrows any captured exception (called by @c co_await).
-     * @throws std::logic_error If the task has no shared state (default-constructed or moved-from).
+     * @throws detail::task_stateless_exception If the task has no shared state (default-constructed or moved-from).
      * @throws TaskAlreadyMovedException If a move-only result was already extracted.
      * @throws Any exception thrown inside the coroutine body.
      */
@@ -108,7 +108,8 @@ public:
     /**
      * @brief Synchronously blocks until completion and returns the computed value
      *        (equivalent to C# @c Task<T>.Result).
-     * @throws std::logic_error If the task has no state, or when called on a pool worker for an unfinished task.
+     * @throws detail::task_stateless_exception If the task has no state.
+ * @throws std::logic_error When called on a pool worker for an unfinished task.
      * @throws TaskAlreadyMovedException If a move-only result was already taken.
      * @throws Any exception thrown inside the coroutine body.
      */

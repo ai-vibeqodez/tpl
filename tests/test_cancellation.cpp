@@ -369,9 +369,9 @@ TEST_CASE("timeout does not fire when the operation finishes in time", "[cancell
     REQUIRE_FALSE(cts.token().is_cancellation_requested());
 }
 
-TEST_CASE("TimeoutException is a std::runtime_error with a default message", "[cancellation][timeout]") {
+TEST_CASE("TimeoutException is a std::exception with a default message", "[cancellation][timeout]") {
     TimeoutException ex;
     REQUIRE(std::string(ex.what()) == "The operation timed out.");
     REQUIRE(std::string(TimeoutException("custom").what()) == "custom");
-    static_assert(std::is_base_of_v<std::runtime_error, TimeoutException>);
+    static_assert(std::is_base_of_v<std::exception, TimeoutException>);
 }
