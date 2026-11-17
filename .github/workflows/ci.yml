@@ -1,59 +1,69 @@
-name: CI & Release
+# CI: build + test on every pull request. The heavier checks (sanitizers, lint, coverage) live in test.yml.
+#
+# Runners are pinned to ubuntu-24.04 on purpose: `ubuntu-latest` moves to 26.04 and would silently change compilers.
+
+name: CI
 
 on:
-  push:
-    branches: [ main, master ]
-    tags: [ 'v*' ]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
+  merge_group:
+    branches: [main, master]
 
 permissions:
-  contents: write
+  contents: read
 
-# Отменяем старые незавершённые запуски для того же PR / ветки
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build (${{ matrix.name }})
+  build-test:
+    name: ${{ matrix.toolchain }} / ${{ matrix.build_type }}
     runs-on: ${{ matrix.os }}
-
     strategy:
       fail-fast: false
       matrix:
         include:
-          - name: Windows-MSVC
+          - toolchain: clang18-libcxx
+            os: ubuntu-24.04
+          - toolchain: gcc15
+            os: ubuntu-24.04
+          - toolchain: msvc
             os: windows-latest
-            cc: cl
-            cxx: cl
-          - name: Linux-GCC
-            os: ubuntu-latest
-            cc: gcc
-            cxx: g++
-          - name: Linux-Clang
-            os: ubuntu-latest
-            cc: clang
-            cxx: clang++
-          - name: macOS-AppleClang
-            os: macos-latest
-            cc: clang
-            cxx: clang++
+        build_type: [Debug, Release]
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install toolchain
+        id: tc
+        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
+        with:
+          toolchain: ${{ matrix.toolchain }}
 
       - name: Configure & Build
         uses: ai-warevo/.github/ci/actions/cmake-build@main
         with:
           source_dir: .
           build_dir: build
-          build_type: Release
-          extra_args: -DAW_TPL_BUILD_EXAMPLES=ON -DAW_TPL_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=install
-          install: true
-          config: ${{ runner.os == 'Windows' && 'Release' || '' }}
+          build_type: ${{ matrix.build_type }}
+          extra_args: >-
+            ${{ steps.tc.outputs.cmake_args }}
+            -DAW_TPL_BUILD_EXAMPLES=ON
+            -DAW_TPL_BUILD_TESTS=ON
+            -DAW_TPL_WARNINGS_AS_ERRORS=ON
+            -DCMAKE_INSTALL_PREFIX=install
+
+      - name: Run Tests
+        uses: ai-warevo/.github/ci/actions/ctest-run@main
+        with:
+          source_dir: .
+          build_dir: build
+          config: ${{ matrix.build_type }}
+          output_on_failure: true
+          timeout: 120
 
       - name: Run Examples (Windows)
         if: runner.os == 'Windows'
@@ -73,45 +83,26 @@ jobs:
             "$example"
           done
 
+      - name: Install
+        run: cmake --install build
+
       - name: Package Artifacts (Windows)
         if: runner.os == 'Windows'
-        run: Compress-Archive -Path install\* -DestinationPath aw_tpl-${{ matrix.name }}.zip
+        run: Compress-Archive -Path install\* -DestinationPath aw_tpl-${{ matrix.toolchain }}-${{ matrix.build_type }}.zip
 
       - name: Package Artifacts (Unix)
         if: runner.os != 'Windows'
-        run: tar -czvf aw_tpl-${{ matrix.name }}.tar.gz -C install .
+        run: tar -czvf aw_tpl-${{ matrix.toolchain }}-${{ matrix.build_type }}.tar.gz -C install .
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: aw_tpl-${{ matrix.name }}
-          path: aw_tpl-${{ matrix.name }}.*
-
-  release:
-    name: Publish GitHub Release
-    needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
+          name: aw_tpl-${{ matrix.toolchain }}-${{ matrix.build_type }}
+          path: aw_tpl-*.zip
+          if-no-files-found: ignore
+      - name: Upload Build Artifact (tar.gz)
+        if: runner.os != 'Windows'
+        uses: actions/upload-artifact@v4
         with:
-          path: artifacts
-          merge-multiple: true
-
-      - name: Extract release notes from CHANGELOG.md
-        id: changelog_parser
-        uses: ai-warevo/.github/ci/actions/changelog-release@main
-        with:
-          tag: ${{ github.ref_name }}
-          release-body: release_body.md
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: artifacts/*
-          body_path: release_body.md
+          name: aw_tpl-${{ matrix.toolchain }}-${{ matrix.build_type }}
+          path: aw_tpl-*.tar.gz

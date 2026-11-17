@@ -1,28 +1,42 @@
+# Tests & Coverage: clang-format, clang-tidy, sanitizers (ASan/UBSan, TSan), coverage badge + HTML deploy.
+#
+# Runners are pinned to ubuntu-24.04 on purpose.
+
 name: Tests & Coverage
 
 on:
   workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
 
 permissions:
   contents: write
 
-# Отменяем старые незавершённые запуски для того же PR / ветки
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   quality-and-tests:
-    name: Unit Tests & Coverage
-    runs-on: ubuntu-latest
+    name: Unit Tests & Coverage (${{ matrix.toolchain }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [clang18-libcxx, clang18-libstdcxx]
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install toolchain
+        id: tc
+        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          tools: true
 
       - name: Check clang-format
         uses: ai-warevo/.github/ci/actions/clang-format@main
@@ -36,7 +50,11 @@ jobs:
           source_dir: .
           build_dir: build
           build_type: Debug
-          extra_args: -DAW_TPL_BUILD_EXAMPLES=OFF -DAW_TPL_BUILD_TESTS=ON -DAW_TPL_ENABLE_COVERAGE=ON
+          extra_args: >-
+            ${{ steps.tc.outputs.cmake_args }}
+            -DAW_TPL_BUILD_EXAMPLES=OFF
+            -DAW_TPL_BUILD_TESTS=ON
+            -DAW_TPL_ENABLE_COVERAGE=ON
 
       - name: Run clang-tidy
         uses: ai-warevo/.github/ci/actions/clang-tidy@main
@@ -95,16 +113,22 @@ jobs:
 
   sanitizers:
     name: Sanitizers (${{ matrix.sanitizer }})
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
-        sanitizer: [ address, thread ]
+        sanitizer: [address, thread]
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install toolchain
+        id: tc
+        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
+        with:
+          toolchain: ${{ matrix.sanitizer == 'thread' && 'clang18-libstdcxx' || 'clang18-libcxx' }}
+          sanitizer_runtime: true
 
       - name: Relax ASLR for ThreadSanitizer
         if: matrix.sanitizer == 'thread'
@@ -116,7 +140,11 @@ jobs:
           source_dir: .
           build_dir: build
           build_type: RelWithDebInfo
-          extra_args: "-DAW_TPL_BUILD_EXAMPLES=OFF -DAW_TPL_BUILD_TESTS=ON -DAW_TPL_SANITIZE=${{ matrix.sanitizer }}"
+          extra_args: >-
+            ${{ steps.tc.outputs.cmake_args }}
+            -DAW_TPL_BUILD_EXAMPLES=OFF
+            -DAW_TPL_BUILD_TESTS=ON
+            -DAW_TPL_SANITIZE=${{ matrix.sanitizer }}
 
       - name: Run CTest
         uses: ai-warevo/.github/ci/actions/ctest-run@main
