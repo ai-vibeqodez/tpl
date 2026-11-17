@@ -106,3 +106,45 @@ jobs:
         with:
           name: aw_tpl-${{ matrix.toolchain }}-${{ matrix.build_type }}
           path: aw_tpl-*.tar.gz
+
+  # Default options (no examples/tests): this is what a consumer gets without enabling anything.
+  build-test-default:
+    name: default options / ${{ matrix.toolchain }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - toolchain: clang18-libcxx
+            os: ubuntu-24.04
+          - toolchain: gcc15
+            os: ubuntu-24.04
+          - toolchain: msvc
+            os: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install toolchain
+        id: tc
+        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
+        with:
+          toolchain: ${{ matrix.toolchain }}
+
+      - name: Configure & Build
+        uses: ai-warevo/.github/ci/actions/cmake-build@main
+        with:
+          source_dir: .
+          build_dir: build
+          build_type: Release
+          extra_args: ${{ steps.tc.outputs.cmake_args }} -DAW_TPL_WARNINGS_AS_ERRORS=ON
+
+      - name: Run Tests
+        uses: ai-warevo/.github/ci/actions/ctest-run@main
+        with:
+          source_dir: .
+          build_dir: build
+          config: Release
+          output_on_failure: true
+          timeout: 120
