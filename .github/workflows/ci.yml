@@ -1,7 +1,8 @@
 # CI: build + test on every pull request. The heavier checks (sanitizers, lint, coverage) live in test.yml.
 #
-# Runs inside ghcr.io/ai-warevo/ci-cpp20: linux/amd64 with gcc-15, clang-18 (libstdc++),
-# clang-tidy, clang-format, cmake, ninja, gcovr — fully reproducible, no runner OS dependency.
+# Linux jobs run inside ghcr.io/ai-warevo/ci-cpp20 (linux/amd64):
+#   gcc-15, clang-18 (libstdc++ + libc++), cmake, ninja, gcovr
+# MSVC runs on windows-latest (native runner).
 
 name: CI
 
@@ -22,6 +23,9 @@ env:
   IMAGE: ghcr.io/ai-warevo/ci-cpp20
 
 jobs:
+  # ────────────────────────────────────────────────────────────
+  # BUILD-TEST — Linux (container)
+  # ────────────────────────────────────────────────────────────
   build-test:
     name: ${{ matrix.toolchain }} / ${{ matrix.build_type }}
     runs-on: ubuntu-latest
@@ -41,55 +45,46 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Verify toolchain
-        run: |
-          echo "=== ${{ matrix.toolchain }} ==="
-          if [ "${{ matrix.toolchain }}" = "gcc15" ]; then
-            g++ --version | head -1
-          else
-            clang++-18 --version | head -1
-          fi
-          cmake --version | head -1
-          ninja --version
+      - name: Setup toolchain
+        id: tc
+        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          container_mode: true
 
       - name: Configure & Build
-        run: |
-          BUILD_DIR="build/${{ matrix.toolchain }}-${{ matrix.build_type }}"
-          if [ "${{ matrix.toolchain }}" = "gcc15" ]; then
-            cmake -B "$BUILD_DIR" -G Ninja \
-              -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-              -DAW_TPL_BUILD_EXAMPLES=ON \
-              -DAW_TPL_BUILD_TESTS=ON \
-              -DAW_TPL_WARNINGS_AS_ERRORS=ON \
-              -DCMAKE_INSTALL_PREFIX=install
-            cmake --build "$BUILD_DIR" --parallel
-          else
-            cmake -B "$BUILD_DIR" -G Ninja \
-              -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-              -DCMAKE_CXX_COMPILER=clang++-18 \
-              -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
-              -DCMAKE_EXE_LINKER_FLAGS="-stdlib=libc++" \
-              -DAW_TPL_BUILD_EXAMPLES=ON \
-              -DAW_TPL_BUILD_TESTS=ON \
-              -DAW_TPL_WARNINGS_AS_ERRORS=ON \
-              -DCMAKE_INSTALL_PREFIX=install
-            cmake --build "$BUILD_DIR" --parallel
-          fi
+        uses: ai-warevo/.github/ci/actions/cmake-build@main
+        with:
+          source_dir: .
+          build_dir: build
+          build_type: ${{ matrix.build_type }}
+          extra_args: >-
+            ${{ steps.tc.outputs.cmake_args }}
+            -DAW_TPL_BUILD_EXAMPLES=ON
+            -DAW_TPL_BUILD_TESTS=ON
+            -DAW_TPL_WARNINGS_AS_ERRORS=ON
+            -DCMAKE_INSTALL_PREFIX=install
 
       - name: Run Tests
-        working-directory: build/${{ matrix.toolchain }}-${{ matrix.build_type }}
-        run: ctest --output-on-failure --timeout 120
+        uses: ai-warevo/.github/ci/actions/ctest-run@main
+        with:
+          source_dir: .
+          build_dir: build
+          config: ${{ matrix.build_type }}
+          output_on_failure: true
+          timeout: 120
 
       - name: Run Examples (Unix)
         run: |
-          BUILD_DIR="build/${{ matrix.toolchain }}-${{ matrix.build_type }}"
-          for example in "$BUILD_DIR"/examples/aw_tpl_example_*; do
+          for example in build/examples/aw_tpl_example_*; do
             echo "=== $(basename "$example")"
             "$example"
           done
 
       - name: Install
-        run: cmake --install build/${{ matrix.toolchain }}-${{ matrix.build_type }}
+        uses: ai-warevo/.github/ci/actions/cmake-build@main
+        with:
+          install: 'true'
 
       - name: Package Artifacts
         run: tar -czvf aw_tpl-${{ matrix.toolchain }}-${{ matrix.build_type }}.tar.gz -C install .
@@ -101,7 +96,63 @@ jobs:
           path: aw_tpl-*.tar.gz
           if-no-files-found: ignore
 
-  # Default options (no examples/tests): this is what a consumer gets without enabling anything.
+  # ────────────────────────────────────────────────────────────
+  # BUILD-TEST — Windows (MSVC native runner)
+  # ────────────────────────────────────────────────────────────
+  build-test-windows:
+    name: Windows MSVC / ${{ matrix.build_type }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Setup toolchain
+        id: tc
+        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
+        with:
+          toolchain: msvc
+
+      - name: Configure & Build
+        uses: ai-warevo/.github/ci/actions/cmake-build@main
+        with:
+          source_dir: .
+          build_dir: build
+          build_type: ${{ matrix.build_type }}
+          extra_args: >-
+            ${{ steps.tc.outputs.cmake_args }}
+            -DAW_TPL_BUILD_EXAMPLES=ON
+            -DAW_TPL_BUILD_TESTS=ON
+            -DAW_TPL_WARNINGS_AS_ERRORS=ON
+
+      - name: Run Tests
+        uses: ai-warevo/.github/ci/actions/ctest-run@main
+        with:
+          source_dir: .
+          build_dir: build
+          config: ${{ matrix.build_type }}
+          output_on_failure: true
+          timeout: 120
+
+      - name: Run Examples (Windows)
+        shell: pwsh
+        run: |
+          $exes = Get-ChildItem -Path "build/examples" -Filter "aw_tpl_example_*.exe"
+          foreach ($exe in $exes) {
+            Write-Host "=== $($exe.Name)"
+            & $exe.FullName
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+  # ────────────────────────────────────────────────────────────
+  # BUILD-TEST-DEFAULT — Linux (container, no examples/tests)
+  # ────────────────────────────────────────────────────────────
   build-test-default:
     name: default options / ${{ matrix.toolchain }}
     runs-on: ubuntu-latest
@@ -117,30 +168,54 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Verify toolchain
-        run: |
-          if [ "${{ matrix.toolchain }}" = "gcc15" ]; then
-            g++ --version | head -1
-          else
-            clang++-18 --version | head -1
-          fi
+      - name: Setup toolchain
+        id: tc
+        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          container_mode: true
 
       - name: Configure & Build
-        run: |
-          BUILD_DIR="build/${{ matrix.toolchain }}-Release"
-          if [ "${{ matrix.toolchain }}" = "gcc15" ]; then
-            cmake -B "$BUILD_DIR" -G Ninja \
-              -DCMAKE_BUILD_TYPE=Release \
-              -DAW_TPL_WARNINGS_AS_ERRORS=ON
-          else
-            cmake -B "$BUILD_DIR" -G Ninja \
-              -DCMAKE_BUILD_TYPE=Release \
-              -DCMAKE_CXX_COMPILER=clang++-18 \
-              -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
-              -DAW_TPL_WARNINGS_AS_ERRORS=ON
-          fi
-          cmake --build "$BUILD_DIR" --parallel
+        uses: ai-warevo/.github/ci/actions/cmake-build@main
+        with:
+          extra_args: >-
+            ${{ steps.tc.outputs.cmake_args }}
+            -DAW_TPL_WARNINGS_AS_ERRORS=ON
 
       - name: Run Tests
-        working-directory: build/${{ matrix.toolchain }}-Release
-        run: ctest --output-on-failure --timeout 120
+        uses: ai-warevo/.github/ci/actions/ctest-run@main
+        with:
+          output_on_failure: true
+          timeout: 120
+
+  # ────────────────────────────────────────────────────────────
+  # BUILD-TEST-DEFAULT — Windows (MSVC native runner, no examples/tests)
+  # ────────────────────────────────────────────────────────────
+  build-test-default-windows:
+    name: Windows default options / MSVC
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Setup toolchain
+        id: tc
+        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
+        with:
+          toolchain: msvc
+
+      - name: Configure & Build
+        uses: ai-warevo/.github/ci/actions/cmake-build@main
+        with:
+          extra_args: >-
+            ${{ steps.tc.outputs.cmake_args }}
+            -DAW_TPL_WARNINGS_AS_ERRORS=ON
+
+      - name: Run Tests
+        uses: ai-warevo/.github/ci/actions/ctest-run@main
+        with:
+          output_on_failure: true
+          timeout: 120
