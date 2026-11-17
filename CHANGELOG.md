@@ -14,6 +14,8 @@ Maintainer notes (see CLAUDE.md, "Changelog & releases"):
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-11-17
+
 ### Added
 
 - libc++ support: `-fexperimental-library` is added as a PUBLIC compile/link option when the toolchain uses libc++ (needed for `std::jthread`/`std::stop_token` up to libc++ 18).
@@ -102,7 +104,8 @@ Maintainer notes (see CLAUDE.md, "Changelog & releases"):
 - `CancellationTokenSource`, `CancellationToken`, `cancel_after` and `OperationCanceledException`.
 - CMake package (`find_package(aw_tpl)` / `FetchContent`) and CI on Windows, Linux and macOS with GitHub Releases.
 
-[Unreleased]: https://github.com/ai-warevo/tpl/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/ai-warevo/tpl/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/ai-warevo/tpl/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/ai-warevo/tpl/compare/v2.0.0...v3.0.0
 [1.0.1]: https://github.com/ai-warevo/tpl/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/ai-warevo/tpl/releases/tag/v1.0.0
