@@ -14,6 +14,10 @@ Maintainer notes (see CLAUDE.md, "Changelog & releases"):
 
 ## [Unreleased]
 
+### Changed
+
+- synchronize project configs and add shared scripts
+
 ## [3.1.0] - 2026-11-17
 
 ### Added
