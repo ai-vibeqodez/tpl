@@ -1,53 +1,62 @@
-BUILD_TYPE = Debug
-BASE_FLAGS = -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
+# ── aw::tpl ──────────────────────────────────────────────────────────────
+# Everyday build targets.
+#
+#   make build | test | demo | clean   (BUILD_TYPE=Debug|Release, default Debug)
+#
+# Examples:
+#   make build BUILD_TYPE=Release
+#   make test BUILD_TYPE=Release
+#   make demo          # build and run all examples
 
-ifeq ($(OS),Windows_NT)
-    PLATFORM = windows
-    EXT = .exe
-else
-    PLATFORM = linux
-    EXT =
-endif
+BUILD_TYPE ?= Debug
+PRESET     := $(if $(filter Release,$(BUILD_TYPE)),release,debug)
 
-BUILD_DIR = build/$(PLATFORM)
-BUILD_DIR_TEST = $(BUILD_DIR)/test
-BUILD_DIR_DEMO = $(BUILD_DIR)/demo
-ifeq ($(PLATFORM),windows)
-    DEMO_DIR = ./$(BUILD_DIR_DEMO)/examples/$(BUILD_TYPE)
-else
-    DEMO_DIR = ./$(BUILD_DIR_DEMO)/examples
-endif
-
-.PHONY: test demo clean release release-dry-run
+.PHONY: test demo lint format clean release release-dry-run
 
 # Configure, build, and run tests only
-test:
-	cmake -B $(BUILD_DIR_TEST) --fresh $(BASE_FLAGS) -DAW_TPL_BUILD_TESTS=ON -DAW_TPL_BUILD_EXAMPLES=OFF
-	cmake --build $(BUILD_DIR_TEST) --config $(BUILD_TYPE) --parallel
-	ctest --test-dir $(BUILD_DIR_TEST) -C $(BUILD_TYPE) --output-on-failure
+build:
+	cmake --preset $(PRESET)
+	cmake --build --preset $(PRESET)
+
+test: build
+	ctest --preset $(PRESET)
 
 # Configure, build, and run every example in examples/
 demo:
-	cmake -B $(BUILD_DIR_DEMO) --fresh $(BASE_FLAGS) -DAW_TPL_BUILD_TESTS=OFF -DAW_TPL_BUILD_EXAMPLES=ON
-	cmake --build $(BUILD_DIR_DEMO) --config $(BUILD_TYPE) --target aw_tpl_examples --parallel
-	for example in $(DEMO_DIR)/aw_tpl_example_*$(EXT); do echo "=== $$example"; "$$example" || exit 1; done
+	cmake --preset $(PRESET) -DAW_TPL_BUILD_TESTS=OFF -DAW_TPL_BUILD_EXAMPLES=ON
+	cmake --build --preset $(PRESET) --target aw_tpl_examples --parallel
+	@if command -v clang-format >/dev/null 2>&1; then \
+	    for example in $(PRESET)/examples/aw_tpl_example_*; do echo "=== $$example"; "$$example" || exit 1; done; \
+	else \
+	    for example in $(PRESET)/examples/aw_tpl_example_*; do echo "=== $$example"; "$$example" || exit 1; done; \
+	fi
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf build
 
 # Cut a SemVer release from CHANGELOG.md [Unreleased]: bump, commit, tag. `make release PUSH=1` also pushes.
-ifeq ($(PLATFORM),windows)
-    RELEASE_CMD = powershell -NoProfile -ExecutionPolicy Bypass -File scripts/release.ps1
-    RELEASE_PUSH = -Push
-    RELEASE_DRY = -DryRun
-else
-    RELEASE_CMD = bash scripts/release.sh
-    RELEASE_PUSH = --push
-    RELEASE_DRY = --dry-run
-endif
+IS_POSIX := $(strip $(if $(MSYSTEM)$(CYGWIN)$(findstring WSL,$(SHELL)),1,))
 
 release:
-	$(RELEASE_CMD) $(if $(PUSH),$(RELEASE_PUSH))
+ifneq ($(IS_POSIX),1)
+	powershell -NoProfile -ExecutionPolicy Bypass -File scripts/release.ps1 $(if $(PUSH),-Push)
+else
+	bash scripts/release.sh $(if $(PUSH),--push)
+endif
 
 release-dry-run:
-	$(RELEASE_CMD) $(RELEASE_DRY)
+ifneq ($(IS_POSIX),1)
+	powershell -NoProfile -ExecutionPolicy Bypass -File scripts/release.ps1 -DryRun
+else
+	bash scripts/release.sh --dry-run
+endif
+
+lint: build
+	@if command -v clang-tidy >/dev/null 2>&1; then \
+	    find include src -name '*.hpp' -o -name '*.cpp' | xargs clang-tidy -p build/$(PRESET); \
+	else echo "clang-tidy not found"; fi
+
+format:
+	@if command -v clang-format >/dev/null 2>&1; then \
+	    find include src examples tests -name '*.hpp' -o -name '*.cpp' 2>/dev/null | xargs clang-format -i; \
+	else echo "clang-format not found (>= 15 required)"; fi

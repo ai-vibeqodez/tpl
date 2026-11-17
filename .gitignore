@@ -46,3 +46,13 @@ _deps/
 # OS specific
 .DS_Store
 Thumbs.db
+
+# Ambiguous name — conflicts with C++20 <version> header when project root
+# is in the include path (target_include_directories adds CMAKE_CURRENT_SOURCE_DIR).
+version
+# ...but the project's own VERSION file (read by aw_project_config) must be tracked: with core.ignorecase=true the
+# pattern above would otherwise hide it, and FetchContent / git clone consumers would fail at configure time.
+!/VERSION
+
+# Developer-local presets (copy CMakeUserPresets.json.example)
+CMakeUserPresets.json

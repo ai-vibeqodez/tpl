@@ -8,7 +8,7 @@
       Added, Deprecated          -> minor
       Fixed, Changed, Security   -> patch
     Then promotes [Unreleased] to "## [X.Y.Z] - <today>", updates the compare links, writes X.Y.Z to VERSION (read by
-    CMakeLists.txt), commits CHANGELOG.md + VERSION as "release vX.Y.Z" and creates the annotated tag vX.Y.Z. Pushing the tag triggers the GitHub release workflow.
+    CMakeLists.txt), commits CHANGELOG.md + VERSION as "chore(release): vX.Y.Z" and creates the annotated tag vX.Y.Z. Pushing the tag triggers the GitHub release workflow.
 
 .PARAMETER Push
     Also push the current branch and the new tag (atomically) to $env:RELEASE_REMOTE (default: origin).
@@ -45,7 +45,7 @@ function Get-GitOutput {
     return $out
 }
 
-$root = (Get-GitOutput rev-parse --show-toplevel | Select-Object -First 1)
+$root = (& git rev-parse --show-toplevel).Trim()
 Set-Location $root
 
 $changelog = 'CHANGELOG.md'
@@ -55,9 +55,8 @@ if (-not (Test-Path -LiteralPath $changelog)) { Fail "$changelog not found" }
 
 $raw = [System.IO.File]::ReadAllText((Join-Path $root $changelog))
 $crlf = $raw.Contains("`r`n")
-$lines = [System.Collections.Generic.List[string]]::new()
-$lines.AddRange([string[]]($raw -split "\r?\n"))
-if ($lines.Count -gt 0 -and $lines[$lines.Count - 1] -eq '') { $lines.RemoveAt($lines.Count - 1) }
+$lines = @($raw -split "\r?\n")
+if ($lines.Count -gt 0 -and $lines[$lines.Count - 1] -eq '') { $lines = $lines[0..($lines.Count - 2)] }
 
 $start = -1
 for ($i = 0; $i -lt $lines.Count; $i++) {
@@ -71,21 +70,21 @@ for ($i = $start + 1; $i -lt $lines.Count; $i++) {
 }
 
 # Split the [Unreleased] body into ### categories; "(none)" collects entries that sit outside any category.
-$categories = [System.Collections.Generic.List[object]]::new()
+$categories = @()
 $current = $null
 for ($i = $start + 1; $i -lt $end; $i++) {
     $line = $lines[$i]
     if ($line -match '^###\s+(.+?)\s*$') {
-        $current = [pscustomobject]@{ Heading = $line; Name = $Matches[1]; Body = [System.Collections.Generic.List[string]]::new() }
-        $categories.Add($current)
+        $current = [pscustomobject]@{ Heading = $line; Name = $Matches[1]; Body = @() }
+        $categories += $current
     } elseif ($line -match '^\s*$' -or $line -match '^<!--') {
-        if ($null -ne $current) { $current.Body.Add($line) }
+        if ($null -ne $current) { $current.Body += $line }
     } else {
         if ($null -eq $current) {
-            $current = [pscustomobject]@{ Heading = $null; Name = '(none)'; Body = [System.Collections.Generic.List[string]]::new() }
-            $categories.Add($current)
+            $current = [pscustomobject]@{ Heading = $null; Name = '(none)'; Body = @() }
+            $categories += $current
         }
-        $current.Body.Add($line)
+        $current.Body += $line
     }
 }
 
@@ -112,12 +111,12 @@ foreach ($category in $filled) {
 }
 
 # Current version = highest of the latest vX.Y.Z tag and the newest "## [X.Y.Z]" heading.
-$found = [System.Collections.Generic.List[version]]::new()
-foreach ($t in @(Get-GitOutput tag --list 'v[0-9]*.[0-9]*.[0-9]*')) {
-    if ($t -match '^v(\d+\.\d+\.\d+)$') { $found.Add([version]$Matches[1]) }
+$found = @()
+foreach ($t in (& git tag --list 'v[0-9]*.[0-9]*.[0-9]*')) {
+    if ($t -match '^v(\d+\.\d+\.\d+)$') { $found += [version]$Matches[1] }
 }
 foreach ($l in $lines) {
-    if ($l -match '^## \[(\d+\.\d+\.\d+)\]') { $found.Add([version]$Matches[1]) }
+    if ($l -match '^## \[(\d+\.\d+\.\d+)\]') { $found += [version]$Matches[1] }
 }
 $hasPrevious = $found.Count -gt 0
 $currentVersion = if ($hasPrevious) { ($found | Sort-Object | Select-Object -Last 1) } else { [version]'0.0.0' }
@@ -151,32 +150,31 @@ $others = @(Get-GitOutput status --porcelain --untracked-files=no | Where-Object
 if ($others.Count -gt 0) { Fail "working tree has uncommitted changes besides $changelog and ${versionFile}:`n$($others -join "`n")" }
 
 # Build the promoted section: "## [X.Y.Z] - date" followed by every non-empty category.
-$section = [System.Collections.Generic.List[string]]::new()
-$section.Add("## [$version] - $today")
-$section.Add('')
+$section = @("## [$version] - $today")
+$section += ''
 foreach ($category in $categories) {
-    $body = [System.Collections.Generic.List[string]]::new($category.Body)
-    while ($body.Count -gt 0 -and $body[0] -match '^\s*$') { $body.RemoveAt(0) }
-    while ($body.Count -gt 0 -and $body[$body.Count - 1] -match '^\s*$') { $body.RemoveAt($body.Count - 1) }
+    $body = @($category.Body)
+    while ($body.Count -gt 0 -and $body[0] -match '^\s*$') { $body = $body[1..($body.Count - 1)] }
+    while ($body.Count -gt 0 -and $body[$body.Count - 1] -match '^\s*$') { $body = $body[0..($body.Count - 2)] }
     if ($body.Count -eq 0 -or $null -eq $category.Heading) { continue }
-    $section.Add($category.Heading)
-    $section.Add('')
-    $section.AddRange($body)
-    $section.Add('')
+    $section += $category.Heading
+    $section += ''
+    $section += $body
+    $section += ''
 }
 
-$result = [System.Collections.Generic.List[string]]::new()
-$result.AddRange($lines.GetRange(0, $start + 1))
-$result.Add('')
-$result.AddRange($section)
-$result.AddRange($lines.GetRange($end, $lines.Count - $end))
+$result = @()
+$result += $lines[0..($start)]
+$result += ''
+$result += $section
+$result += $lines[$end..($lines.Count - 1)]
 
 for ($i = 0; $i -lt $result.Count; $i++) {
     if ($result[$i] -match '^\[Unreleased\]:\s+(.*?)/compare/') {
         $base = $Matches[1]
         $newLink = if ($hasPrevious) { "[$version]: $base/compare/$previousTag...$tag" } else { "[$version]: $base/releases/tag/$tag" }
         $result[$i] = "[Unreleased]: $base/compare/$tag...HEAD"
-        $result.Insert($i + 1, $newLink)
+        $result = @($result[0..$i]) + $newLink + $result[($i + 1)..($result.Count - 1)]
         break
     }
 }
@@ -188,7 +186,7 @@ $text = ($result -join $newline) + $newline
 [System.IO.File]::WriteAllText((Join-Path $root $versionFile), "$version`n", (New-Object System.Text.UTF8Encoding($false)))
 
 Invoke-Git add -- $changelog $versionFile
-Invoke-Git commit -m "release $tag" -- $changelog $versionFile
+Invoke-Git commit -m "chore(release): v$version" -- $changelog $versionFile
 Invoke-Git tag -a $tag -m "release $tag"
 Write-Host "Created commit and annotated tag $tag."
 

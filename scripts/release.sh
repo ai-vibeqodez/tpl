@@ -8,7 +8,7 @@
 #   Added, Deprecated          -> minor
 #   Fixed, Changed, Security   -> patch
 # Then promotes [Unreleased] to "## [X.Y.Z] - <today>", updates the compare links, writes X.Y.Z to VERSION (read by
-# CMakeLists.txt), commits CHANGELOG.md + VERSION as "release vX.Y.Z" and creates the annotated tag vX.Y.Z.
+# CMakeLists.txt), commits CHANGELOG.md + VERSION as "chore(release): vX.Y.Z" and creates the annotated tag vX.Y.Z.
 # --push also pushes the branch and the tag (atomically) to $RELEASE_REMOTE (default: origin); pushing the tag
 # triggers the GitHub release workflow.
 set -euo pipefail
@@ -35,8 +35,8 @@ remote="${RELEASE_REMOTE:-origin}"
 # Work on an LF copy so the awk below is line-ending agnostic; restore CRLF on write if the file used it.
 crlf=0
 if grep -q $'\r' "$changelog"; then crlf=1; fi
-work="$(mktemp)"
-out="$(mktemp)"
+work="$(mktemp -p /tmp)"
+out="$(mktemp -p /tmp)"
 trap 'rm -f "$work" "$out"' EXIT
 tr -d '\r' < "$changelog" > "$work"
 
@@ -100,8 +100,7 @@ if [ "$dry_run" -eq 1 ]; then
 fi
 
 git rev-parse -q --verify "refs/tags/$tag" > /dev/null && die "tag $tag already exists"
-if ! git diff --quiet --cached; then die "the index has staged changes; commit or unstage them first"; fi
-others="$(git status --porcelain --untracked-files=no | grep -v -E "^.. \"?($changelog|$version_file)\"?$" || true)"
+others="$(git status --porcelain --untracked-files=no | grep -v -E " \"?($changelog|$version_file)\"?$" || true)"
 [ -z "$others" ] || die "working tree has uncommitted changes besides $changelog and $version_file:"$'\n'"$others"
 
 awk -v ver="$version" -v tag="$tag" -v prev="v$current" -v has_prev="$has_previous" -v date="$today" '
@@ -142,7 +141,7 @@ if [ "$crlf" -eq 1 ]; then sed 's/$/\r/' "$out" > "$changelog"; else cp "$out" "
 printf '%s\n' "$version" > "$version_file"
 
 git add -- "$changelog" "$version_file"
-git commit -m "release $tag" -- "$changelog" "$version_file"
+git commit -m "chore(release): v$version" -- "$changelog" "$version_file"
 git tag -a "$tag" -m "release $tag"
 echo "Created commit and annotated tag $tag."
 

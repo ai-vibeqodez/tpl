@@ -1,2 +1,3 @@
-# Keep shell scripts LF so the shebang works after a Windows checkout.
+# Keep shell scripts and the generator LF so shebangs and rendering work after a Windows checkout.
 *.sh text eol=lf
+Makefile text eol=lf
