@@ -31,6 +31,20 @@ elseif(MSVC)
 else()
     set(CMAKE_REQUIRED_FLAGS "-std=c++20")
 endif()
+# libc++ (up to at least 18) ships std::jthread / std::stop_token only behind -fexperimental-library.
+set(AW_TPL_NEEDS_EXPERIMENTAL_LIBRARY OFF)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    check_cxx_source_compiles("
+#include <version>
+#ifndef _LIBCPP_VERSION
+#error not libc++
+#endif
+int main() {}" AW_TPL_USES_LIBCXX)
+    if(AW_TPL_USES_LIBCXX)
+        set(AW_TPL_NEEDS_EXPERIMENTAL_LIBRARY ON)
+        string(APPEND CMAKE_REQUIRED_FLAGS " -fexperimental-library")
+    endif()
+endif()
 set(CMAKE_REQUIRED_LIBRARIES Threads::Threads)
 check_cxx_source_compiles("
 #include <coroutine>
@@ -143,6 +157,10 @@ target_sources(aw_tpl
 target_link_libraries(aw_tpl PUBLIC Threads::Threads)
 if(AW_TPL_NEEDS_FCOROUTINES)
     target_compile_options(aw_tpl PUBLIC -fcoroutines)
+endif()
+if(AW_TPL_NEEDS_EXPERIMENTAL_LIBRARY)
+    target_compile_options(aw_tpl PUBLIC -fexperimental-library)
+    target_link_options(aw_tpl PUBLIC -fexperimental-library)
 endif()
 option(AW_TPL_ENABLE_COVERAGE "Enable code coverage instrumentation" OFF)
 

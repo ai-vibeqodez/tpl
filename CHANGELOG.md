@@ -16,6 +16,7 @@ Maintainer notes (see CLAUDE.md, "Changelog & releases"):
 
 ### Added
 
+- libc++ support: `-fexperimental-library` is added as a PUBLIC compile/link option when the toolchain uses libc++ (needed for `std::jthread`/`std::stop_token` up to libc++ 18).
 - `co_spawn(Task<T>)`, `co_spawn(Task<T>, ErrorHandler)` and `co_spawn(TaskGroup&, Task<T>, ErrorHandler)`: explicit fire-and-forget with optional error reporting and drain tracking.
 - `TaskGroup` (`add()`/`done()`/`wait()`/`wait_async()`/`pending()`): counter of in-flight operations that can be drained.
 - Example `08_co_spawn`.
