@@ -13,6 +13,23 @@ Maintainer notes (see CLAUDE.md, "Changelog & releases"):
 -->
 
 ## [Unreleased]
+## [Unreleased]
+
+### Breaking
+
+- derive custom exceptions from std::exception to fix ASan mismatch
+
+### Fixed
+
+- scripts
+- use inline CMake commands for Windows/MSVC jobs
+
+### Changed
+
+- add MSVC support to CI/CD workflows
+- run all jobs inside ghcr.io/ai-warevo/ci-cpp20 container
+- align tpl workflows with tobus pattern, fix ASAN_OPTIONS
+- add setup-toolchain (clang18-libcxx, gcc15, msvc) to CI matrix
 
 ## [3.1.1] - 2026-11-18
 

@@ -192,7 +192,7 @@ $result = @()
 
 if ($hasUnreleased) {
     # Replace existing [Unreleased] section.
-    $result += $lines[0..($startIdx)]
+    $result += $lines[0..($startIdx - 1)]
     $result += ($sectionContent -split "`n")
     $result += $lines[$endIdx..($lines.Count - 1)]
 } else {
