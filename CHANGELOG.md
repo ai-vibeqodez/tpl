@@ -13,6 +13,26 @@ Maintainer notes (see CLAUDE.md, "Changelog & releases"):
 -->
 
 ## [Unreleased]
+
+## [4.0.0] - 2026-11-18
+
+### Breaking
+
+- derive custom exceptions from std::exception to fix ASan mismatch
+
+### Fixed
+
+- scripts
+- scripts
+- use inline CMake commands for Windows/MSVC jobs
+
+### Changed
+
+- add MSVC support to CI/CD workflows
+- run all jobs inside ghcr.io/ai-warevo/ci-cpp20 container
+- align tpl workflows with tobus pattern, fix ASAN_OPTIONS
+- add setup-toolchain (clang18-libcxx, gcc15, msvc) to CI matrix
+
 ## [Unreleased]
 
 ### Breaking
@@ -127,7 +147,8 @@ Maintainer notes (see CLAUDE.md, "Changelog & releases"):
 - `CancellationTokenSource`, `CancellationToken`, `cancel_after` and `OperationCanceledException`.
 - CMake package (`find_package(aw_tpl)` / `FetchContent`) and CI on Windows, Linux and macOS with GitHub Releases.
 
-[Unreleased]: https://github.com/ai-warevo/tpl/compare/v3.1.1...HEAD
+[Unreleased]: https://github.com/ai-warevo/tpl/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/ai-warevo/tpl/compare/v3.1.1...v4.0.0
 [3.1.1]: https://github.com/ai-warevo/tpl/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/ai-warevo/tpl/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/ai-warevo/tpl/compare/v2.0.0...v3.0.0
