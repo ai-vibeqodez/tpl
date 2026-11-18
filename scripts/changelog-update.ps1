@@ -43,7 +43,8 @@ $changelog = 'CHANGELOG.md'
 if (-not (Test-Path -LiteralPath $changelog)) { Fail "$changelog not found" }
 
 # Determine the previous tag.
-$prevTag = (& git tag -l 'v*' --sort=-version:refname)[0]
+$prevTags = & git tag -l 'v*' --sort=-version:refname 2>$null
+$prevTag = if ($prevTags) { $prevTags[0] } else { $null }
 if ($prevTag) {
     $range = "$prevTag..HEAD"
 } else {
