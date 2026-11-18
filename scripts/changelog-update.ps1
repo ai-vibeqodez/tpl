@@ -137,10 +137,35 @@ if ($DryRun) {
     exit 0
 }
 
-# Check if [Unreleased] already has entries.
-$hasUnreleased = Select-String -Path $changelog -Pattern '^## \[Unreleased\]' -Quiet
+# Read the changelog early (needed for body check and replacement below).
+$raw = [System.IO.File]::ReadAllText((Join-Path $root $changelog))
+$crlf = $raw.Contains("`r`n")
+$lines = @($raw -split "\r?\n")
+if ($lines.Count -gt 0 -and $lines[$lines.Count - 1] -eq '') { $lines = $lines[0..($lines.Count - 2)] }
+
+# Find the ## [Unreleased] section boundaries.
+$hasUnreleased = $false
+$startIdx = -1
+$endIdx = $lines.Count
+for ($i = 0; $i -lt $lines.Count; $i++) {
+    if ($lines[$i] -match '^## \[Unreleased\]') { $startIdx = $i; $hasUnreleased = $true; break }
+}
+if ($startIdx -ge 0) {
+    for ($i = $startIdx + 1; $i -lt $lines.Count; $i++) {
+        if ($lines[$i] -match '^## \[') { $endIdx = $i; break }
+        if ($lines[$i] -match '^\[[^]]+\]:') { $endIdx = $i; break }
+    }
+}
+
+# Check if [Unreleased] already has entries (non-blank, non-comment lines between heading and next section).
 if ($hasUnreleased -and -not $Force) {
-    Fail '[Unreleased] already has entries. Use -Force to overwrite, or run release.sh to cut a release first.'
+    $hasBody = $false
+    for ($i = $startIdx + 1; $i -lt $endIdx; $i++) {
+        if ($lines[$i] -notmatch '^\s*$' -and $lines[$i] -notmatch '^<!--') { $hasBody = $true; break }
+    }
+    if ($hasBody) {
+        Fail '[Unreleased] already has entries. Use -Force to overwrite, or run release.sh to cut a release first.'
+    }
 }
 
 # Build the [Unreleased] section content.
@@ -163,29 +188,13 @@ foreach ($key in $catOrder) {
 
 $sectionContent = ($sectionLines -join "`n") + "`n"
 
-# Read the changelog.
-$raw = [System.IO.File]::ReadAllText((Join-Path $root $changelog))
-$crlf = $raw.Contains("`r`n")
-$lines = @($raw -split "\r?\n")
-if ($lines.Count -gt 0 -and $lines[$lines.Count - 1] -eq '') { $lines = $lines[0..($lines.Count - 2)] }
-
 $result = @()
 
 if ($hasUnreleased) {
     # Replace existing [Unreleased] section.
-    $startIdx = -1
-    $endIdx = $lines.Count
-    for ($i = 0; $i -lt $lines.Count; $i++) {
-        if ($lines[$i] -match '^## \[Unreleased\]') { $startIdx = $i; break }
-    }
-    if ($startIdx -ge 0) {
-        for ($i = $startIdx + 1; $i -lt $lines.Count; $i++) {
-            if ($lines[$i] -match '^## \[') { $endIdx = $i; break }
-        }
-        $result += $lines[0..($startIdx)]
-        $result += ($sectionContent -split "`n")
-        $result += $lines[$endIdx..($lines.Count - 1)]
-    }
+    $result += $lines[0..($startIdx)]
+    $result += ($sectionContent -split "`n")
+    $result += $lines[$endIdx..($lines.Count - 1)]
 } else {
     # Insert after "# Changelog" header.
     $inserted = $false
