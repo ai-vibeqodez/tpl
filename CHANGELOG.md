@@ -14,6 +14,12 @@ Maintainer notes (see CLAUDE.md, "Changelog & releases"):
 
 ## [Unreleased]
 
+## [4.0.1] - 2026-11-18
+
+### Fixed
+
+- fix duplicate heading and empty tag list handling
+
 ## [4.0.0] - 2026-11-18
 
 ### Breaking
@@ -147,7 +153,8 @@ Maintainer notes (see CLAUDE.md, "Changelog & releases"):
 - `CancellationTokenSource`, `CancellationToken`, `cancel_after` and `OperationCanceledException`.
 - CMake package (`find_package(aw_tpl)` / `FetchContent`) and CI on Windows, Linux and macOS with GitHub Releases.
 
-[Unreleased]: https://github.com/ai-warevo/tpl/compare/v4.0.0...HEAD
+[Unreleased]: https://github.com/ai-warevo/tpl/compare/v4.0.1...HEAD
+[4.0.1]: https://github.com/ai-warevo/tpl/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/ai-warevo/tpl/compare/v3.1.1...v4.0.0
 [3.1.1]: https://github.com/ai-warevo/tpl/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/ai-warevo/tpl/compare/v3.0.0...v3.1.0
