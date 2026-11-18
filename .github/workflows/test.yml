@@ -288,28 +288,12 @@ jobs:
       - name: Setup MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Setup toolchain
-        id: tc
-        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
-        with:
-          toolchain: msvc
-
       - name: Configure & Build
-        uses: ai-warevo/.github/ci/actions/cmake-build@main
-        with:
-          source_dir: .
-          build_dir: build
-          build_type: ${{ matrix.build_type }}
-          extra_args: >-
-            ${{ steps.tc.outputs.cmake_args }}
-            -DAW_TPL_BUILD_TESTS=ON
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} `
+            -DAW_TPL_BUILD_TESTS=ON `
             -DAW_TPL_WARNINGS_AS_ERRORS=ON
+          cmake --build build --parallel --config ${{ matrix.build_type }}
 
       - name: Run Tests
-        uses: ai-warevo/.github/ci/actions/ctest-run@main
-        with:
-          source_dir: .
-          build_dir: build
-          config: ${{ matrix.build_type }}
-          output_on_failure: true
-          timeout: 120
+        run: ctest --test-dir build --config ${{ matrix.build_type }} --output-on-failure --timeout 120
