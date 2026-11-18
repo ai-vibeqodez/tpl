@@ -1,3 +1,4 @@
+# SCRIPT_VERSION=1.0.0
 <#
 .SYNOPSIS
     Update CHANGELOG.md [Unreleased] from git log (Windows; Linux/macOS: scripts/changelog-update.sh).

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SCRIPT_VERSION=1.0.0
+#
 # Update CHANGELOG.md [Unreleased] from git log (Linux/macOS).
 #
 # Scans commits since the latest tag, groups them by conventional commit prefix,
@@ -19,6 +21,15 @@
 #   revert(...)                    → ### Removed
 
 set -euo pipefail
+
+# ── Pre-flight: check for script updates (non-blocking) ──────────────
+_updater="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/updater.sh"
+if [ -x "$_updater" ]; then
+    bash "$_updater" --check-only >/dev/null 2>&1 || {
+        echo "[INFO]  New script updates available. Run: bash scripts/updater.sh" >&2
+    }
+fi
+unset _updater
 
 dry_run=0
 force=0

@@ -1,3 +1,4 @@
+# SCRIPT_VERSION=1.0.0
 <#
 .SYNOPSIS
     Cut a SemVer release from CHANGELOG.md (Windows; Linux/macOS equivalent: scripts/release.sh).

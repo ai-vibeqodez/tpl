@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SCRIPT_VERSION=1.0.0
+#
 # Cut a SemVer release from CHANGELOG.md (Linux/macOS). Windows equivalent: scripts/release.ps1.
 #
 #   scripts/release.sh [--dry-run] [--push] [-h|--help]
@@ -12,6 +14,15 @@
 # --push also pushes the branch and the tag (atomically) to $RELEASE_REMOTE (default: origin); pushing the tag
 # triggers the GitHub release workflow.
 set -euo pipefail
+
+# ── Pre-flight: check for script updates (non-blocking) ──────────────
+_updater="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/updater.sh"
+if [ -x "$_updater" ]; then
+    bash "$_updater" --check-only >/dev/null 2>&1 || {
+        echo "[INFO]  New script updates available. Run: bash scripts/updater.sh" >&2
+    }
+fi
+unset _updater
 
 push=0
 dry_run=0
