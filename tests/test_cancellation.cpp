@@ -175,6 +175,20 @@ TEST_CASE("All cancellation callbacks run even if one throws", "[cancellation][e
     REQUIRE(token.is_cancellation_requested());
 }
 
+TEST_CASE("Multiple throwing cancellation callbacks all run; the first exception wins", "[cancellation][exceptions]") {
+    CancellationTokenSource cts;
+    auto token = cts.token();
+    std::atomic<int> hits{0};
+    token.register_callback([] { throw std::runtime_error("first"); });
+    token.register_callback([&] { ++hits; });
+    token.register_callback([] { throw std::logic_error("second"); });
+
+    // All callbacks ran (hit counter reached 1) and the first failure is the one rethrown.
+    REQUIRE_THROWS_AS(cts.cancel(), std::runtime_error);
+    REQUIRE(hits.load() == 1);
+    REQUIRE(token.is_cancellation_requested());
+}
+
 // --- Task 21: moved-from source ---
 
 TEST_CASE("Moved-from CancellationTokenSource is inert", "[cancellation][move]") {

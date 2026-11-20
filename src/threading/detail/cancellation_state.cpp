@@ -16,17 +16,20 @@ void CancellationState::cancel() {
         to_run.swap(callbacks);
     }
     // The lock is not held while callbacks run. A throwing callback must not prevent the others
-    // from running (they may resume sleeping coroutines), so remember the first error and rethrow it.
-    std::exception_ptr first_error;
-    std::ranges::for_each(to_run, [&first_error](auto& entry) {
+    // from running (they may resume sleeping coroutines), so every failure is collected; the first
+    // one is rethrown afterwards, matching the documented first-exception-wins contract.
+    std::vector<std::exception_ptr> errors;
+    std::ranges::for_each(to_run, [&errors](auto& entry) {
         if (!entry.second) return;
         try {
             entry.second();
         } catch (...) {
-            if (!first_error) first_error = std::current_exception();
+            errors.push_back(std::current_exception());
         }
     });
-    if (first_error) std::rethrow_exception(first_error);
+    if (!errors.empty()) {
+        std::rethrow_exception(errors.front());
+    }
 }
 
 std::uint64_t CancellationState::register_callback(std::move_only_function<void()> cb) {
