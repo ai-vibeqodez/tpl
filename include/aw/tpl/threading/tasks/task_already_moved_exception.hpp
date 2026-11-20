@@ -17,8 +17,15 @@ public:
     /// Returns the exception message.
     const char* what() const noexcept override;
 
+    /**
+     * @brief Returns the reason the move already occurred.
+     * @return Reason string describing the context.
+     */
+    const std::string& exception_reason() const noexcept { return reason_; }
+
 private:
     std::string message_;
+    std::string reason_;
 };
 
 } // namespace aw::tpl::threading::tasks

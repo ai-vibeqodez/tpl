@@ -22,11 +22,25 @@ public:
      */
     explicit TimeoutException(const std::string& message);
 
+    /**
+     * @brief Creates the exception with a custom message and reason.
+     * @param[in] message Text returned by @c what().
+     * @param[in] reason Brief description of what operation timed out.
+     */
+    TimeoutException(const std::string& message, const std::string& reason);
+
     /// Returns the exception message.
     const char* what() const noexcept override;
 
+    /**
+     * @brief Returns the reason the operation timed out.
+     * @return Reason string (empty if not provided).
+     */
+    const std::string& exception_reason() const noexcept { return reason_; }
+
 private:
     std::string message_;
+    std::string reason_;
 };
 
 } // namespace aw::tpl
