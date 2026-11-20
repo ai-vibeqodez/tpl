@@ -3,6 +3,8 @@
 
 #include <aw/tpl/threading/detail/pool_scheduling.hpp>
 
+#include <ranges>
+
 namespace aw::tpl::threading::tasks::detail {
 
 void throw_task_has_no_state() {
@@ -52,9 +54,8 @@ std::coroutine_handle<> TaskStateBase::finish() {
 
     // The first continuation is resumed by symmetric transfer, the rest are scheduled on the pool.
     std::coroutine_handle<> first = to_resume.front();
-    for (std::size_t i = 1; i < to_resume.size(); ++i) {
-        threading::detail::schedule_on_pool(to_resume[i]);
-    }
+    std::for_each(to_resume.begin() + 1, to_resume.end(),
+                  [](auto h) { threading::detail::schedule_on_pool(h); });
     return first;
 }
 

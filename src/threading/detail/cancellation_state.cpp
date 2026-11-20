@@ -18,14 +18,14 @@ void CancellationState::cancel() {
     // The lock is not held while callbacks run. A throwing callback must not prevent the others
     // from running (they may resume sleeping coroutines), so remember the first error and rethrow it.
     std::exception_ptr first_error;
-    for (auto& entry : to_run) {
-        if (!entry.second) continue;
+    std::ranges::for_each(to_run, [&first_error](auto& entry) {
+        if (!entry.second) return;
         try {
             entry.second();
         } catch (...) {
             if (!first_error) first_error = std::current_exception();
         }
-    }
+    });
     if (first_error) std::rethrow_exception(first_error);
 }
 
