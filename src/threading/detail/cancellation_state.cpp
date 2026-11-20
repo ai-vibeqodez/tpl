@@ -1,6 +1,8 @@
 #include <aw/tpl/threading/detail/cancellation_state.hpp>
 
+#include <algorithm>
 #include <exception>
+#include <ranges>
 
 namespace aw::tpl::threading::detail {
 
@@ -49,11 +51,10 @@ std::uint64_t CancellationState::register_callback(std::function<void()> cb) {
 bool CancellationState::unregister_callback(std::uint64_t id) {
     if (id == 0) return false;
     std::lock_guard lock(mtx);
-    for (auto it = callbacks.begin(); it != callbacks.end(); ++it) {
-        if (it->first == id) {
-            callbacks.erase(it);
-            return true;
-        }
+    if (auto it = std::ranges::find_if(callbacks, [id](const auto& e) { return e.first == id; });
+        it != callbacks.end()) {
+        callbacks.erase(it);
+        return true;
     }
     return false;
 }

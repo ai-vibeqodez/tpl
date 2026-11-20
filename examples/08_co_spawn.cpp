@@ -3,7 +3,7 @@
 
 #include <atomic>
 #include <exception>
-#include <iostream>
+#include <print>
 #include <stdexcept>
 
 using namespace std::chrono_literals;
@@ -34,11 +34,11 @@ int main() {
         try {
             std::rethrow_exception(ep);
         } catch (const std::exception& ex) {
-            std::cout << "spawned task failed: " << ex.what() << "\n";
+            std::print("spawned task failed: {}\n", ex.what());
         }
     });
 
     group.wait(); // blocking drain on a non-pool thread; use `co_await group.wait_async()` in coroutines
-    std::cout << "completed: " << counter << "\n";
+    std::print("completed: {}\n", counter.load());
     return 0;
 }

@@ -1,9 +1,10 @@
 // Task<>::run: offload callables (lambdas, functors, move-only callables) to the thread pool.
 #include <aw/tpl/tpl.hpp>
 
-#include <iostream>
+#include <format>
 #include <memory>
 #include <numeric>
+#include <print>
 #include <string>
 #include <vector>
 
@@ -25,7 +26,7 @@ Task<int> parallel_sum(std::vector<int> numbers) {
 
 int main() {
     // 1. Void callable.
-    Task<>::run([] { std::cout << "running on a pool thread\n"; }).wait();
+    Task<>::run([] { std::print("running on a pool thread\n"); }).wait();
 
     // 2. Callable with a result; the captured text outlives its original scope.
     Task<std::string> greeting;
@@ -33,12 +34,12 @@ int main() {
         std::string name = "tpl";
         greeting = Task<>::run([name] { return "hello, " + name; });
     }
-    std::cout << greeting.result() << "\n";
+    std::print("{}\n", greeting.result());
 
     // 3. Move-only callable.
-    std::cout << "move-only job = " << Task<>::run(MoveOnlyJob{std::make_unique<int>(21)}).result() << "\n";
+    std::print("move-only job = {}\n", Task<>::run(MoveOnlyJob{std::make_unique<int>(21)}).result());
 
     // 4. Awaiting a run() from inside a coroutine.
-    std::cout << "sum = " << parallel_sum({1, 2, 3, 4, 5}).result() << "\n";
+    std::print("sum = {}\n", parallel_sum({1, 2, 3, 4, 5}).result());
     return 0;
 }

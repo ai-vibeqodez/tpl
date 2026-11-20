@@ -1,6 +1,6 @@
 # Contributing to aw::tpl
 
-Thank you for your interest in contributing to **aw::tpl** — the C++20 library that brings C# Task Parallel Library ergonomics to modern C++ coroutines.
+Thank you for your interest in contributing to **aw::tpl** — the C++23 library that brings C# Task Parallel Library ergonomics to modern C++ coroutines.
 
 ## 🚀 Quick Start
 
@@ -25,7 +25,7 @@ Thank you for your interest in contributing to **aw::tpl** — the C++20 library
 
 ### Coding Standards
 
-- **C++20 idiomatic style**: concepts/requires over SFINAE, coroutines, `std::jthread`, RAII everywhere
+- **C++23 idiomatic style**: concepts/requires over SFINAE, coroutines, `std::jthread`, RAII everywhere
 - **Naming conventions**: types `PascalCase`, functions/variables `snake_case`, private members `trailing_underscore_`
 - **Formatting**: 4 spaces, 120 cols, attached braces (see `.clang-format`, `.editorconfig`)
 - **Headers**: `#pragma once`, include groups (own header → `<aw/tpl/...>` → `<std>`), blank line between groups

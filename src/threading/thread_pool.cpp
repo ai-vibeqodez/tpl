@@ -2,7 +2,9 @@
 
 #include <aw/tpl/threading/detail/pool_scheduling.hpp>
 
+#include <algorithm>
 #include <atomic>
+#include <ranges>
 #include <thread>
 
 namespace aw::tpl::threading {
@@ -113,8 +115,7 @@ void ThreadPool::shutdown() noexcept {
     // Step 3: stop and join the workers; they keep draining the queue until it is empty.
     {
         std::lock_guard lock(queue_mtx_);
-        for (auto& w : workers_)
-            w.request_stop();
+        std::ranges::for_each(workers_, &std::jthread::request_stop);
     }
     queue_cv_.notify_all();
     for (auto& w : workers_) {

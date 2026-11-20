@@ -6,7 +6,7 @@
 //   catch (OperationCanceledException) { throw new TimeoutException("The operation timed out."); }
 #include <aw/tpl/tpl.hpp>
 
-#include <iostream>
+#include <print>
 #include <string>
 
 using namespace std::chrono_literals;
@@ -32,13 +32,13 @@ Task<std::string> fetch_with_timeout(std::chrono::milliseconds work, std::chrono
 Task<void> app() {
     // 1. Finishes in time.
     std::string data = co_await fetch_with_timeout(50ms, 1000ms);
-    std::cout << "1. got: " << data << "\n";
+    std::print("1. got: {}\n", data);
 
     // 2. Exceeds the limit.
     try {
         (void)co_await fetch_with_timeout(5000ms, 100ms);
     } catch (const TimeoutException& ex) {
-        std::cout << "2. timeout: " << ex.what() << "\n";
+        std::print("2. timeout: {}\n", ex.what());
     }
 
     // 3. Timeout combined with manual cancellation: link both with one source.
@@ -49,7 +49,7 @@ Task<void> app() {
         try {
             (void)co_await op;
         } catch (const OperationCanceledException&) {
-            std::cout << "3. canceled before the timeout\n";
+            std::print("3. canceled before the timeout\n");
         }
     }
 }

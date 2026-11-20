@@ -1,11 +1,13 @@
 // when_all: wait for several tasks (variadic with mixed types, or a vector of tasks).
 #include <aw/tpl/tpl.hpp>
 
-#include <iostream>
+#include <format>
+#include <memory>
+#include <print>
+#include <algorithm>
 #include <stdexcept>
 #include <string>
 #include <variant>
-#include <vector>
 
 using namespace std::chrono_literals;
 using namespace aw::tpl;
@@ -32,37 +34,39 @@ Task<int> failing() {
     co_return 0;
 }
 
+// Helper: normalises bool to lowercase "true"/"false".
+inline std::string bool_str(bool v) { return std::format("{}", v ? "true" : "false"); }
+
 Task<void> app() {
     // 1. Heterogeneous: a tuple of results; Task<void> children yield std::monostate.
     auto [n, s, unit] = co_await when_all(number(1, 120ms), text("two", 60ms), nothing(30ms));
-    std::cout << "tuple: " << n << ", " << s << ", monostate? " << std::boolalpha
-              << std::is_same_v<decltype(unit), std::monostate> << "\n";
+    std::print("tuple: {}, {}, monostate? {}\n", n, s, bool_str(std::is_same_v<decltype(unit), std::monostate>));
 
     // 2. Only Task<void> children: the result is a Task<void>.
     co_await when_all(nothing(20ms), nothing(40ms));
-    std::cout << "all void tasks done\n";
+    std::print("all void tasks done\n");
 
     // 3. Vector of Task<T>: a vector of results in the original order.
-    std::vector<Task<int>> many;
-    for (int i = 1; i <= 4; ++i)
-        many.push_back(number(i * 10, std::chrono::milliseconds(100 - i * 20)));
+    std::vector<Task<int>> many{
+        number(10, 80ms),
+        number(20, 60ms),
+        number(30, 40ms),
+        number(40, 20ms),
+    };
     std::vector<int> results = co_await when_all(std::move(many));
-    std::cout << "vector:";
-    for (int r : results)
-        std::cout << " " << r;
-    std::cout << "\n";
+    std::print("vector:");
+    std::for_each(results.begin(), results.end(), [](int r) { std::print(" {}", r); });
+    std::print("\n");
 
     // 4. Vector of Task<void>.
-    std::vector<Task<void>> voids;
-    voids.push_back(nothing(10ms));
-    voids.push_back(nothing(20ms));
+    std::vector<Task<void>> voids{nothing(10ms), nothing(20ms)};
     co_await when_all(std::move(voids));
 
     // 5. Failures: every child is awaited first, then the first failure (in argument order) is rethrown.
     try {
         (void)co_await when_all(number(1, 100ms), failing());
     } catch (const std::runtime_error& ex) {
-        std::cout << "when_all rethrew: " << ex.what() << "\n";
+        std::print("when_all rethrew: {}\n", ex.what());
     }
 }
 

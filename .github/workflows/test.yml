@@ -4,7 +4,7 @@
 #   stress      30x the concurrency tests in optimized builds (different timing, different races)
 #   coverage    gcc --coverage -> gcovr; the badge/report are published only from main
 #
-# Linux jobs run inside ghcr.io/ai-warevo/ci-cpp20 (gcc-15, clang-18, cmake, ninja, gcovr).
+# Linux jobs run inside ghcr.io/ai-warevo/ci-cpp23 (gcc-15, clang-18, cmake, ninja, gcovr).
 # MSVC jobs run on windows-latest (native runner).
 # Coverage deploy actions run on ubuntu-latest (they only push badges/HTML, no toolchain).
 
@@ -25,7 +25,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  IMAGE: ghcr.io/ai-warevo/ci-cpp20
+  IMAGE: ghcr.io/ai-warevo/ci-cpp23
 
 jobs:
   # ────────────────────────────────────────────────────────────

@@ -2,7 +2,9 @@
 #include <aw/tpl/tpl.hpp>
 
 #include <atomic>
-#include <iostream>
+#include <format>
+#include <memory>
+#include <print>
 
 using namespace std::chrono_literals;
 using namespace aw::tpl;
@@ -24,6 +26,9 @@ Task<int> polling_loop(CancellationToken token) {
     }
 }
 
+// Helper: normalises bool to lowercase "true"/"false".
+inline std::string bool_str(bool v) { return std::format("{}", v ? "true" : "false"); }
+
 int main() {
     // 1. Cancel from the outside.
     {
@@ -33,7 +38,7 @@ int main() {
         try {
             (void)op.result();
         } catch (const OperationCanceledException& ex) {
-            std::cout << "1. canceled: " << ex.what() << "\n";
+            std::print("1. canceled: {}\n", ex.what());
         }
     }
 
@@ -44,7 +49,7 @@ int main() {
         try {
             (void)long_operation(cts.token()).result();
         } catch (const OperationCanceledException&) {
-            std::cout << "2. canceled by cancel_after(100ms)\n";
+            std::print("2. canceled by cancel_after(100ms)\n");
         }
     }
 
@@ -55,8 +60,7 @@ int main() {
         try {
             (void)polling_loop(cts.token()).result();
         } catch (const OperationCanceledException&) {
-            std::cout << "3. polling loop stopped, requested = " << std::boolalpha
-                      << cts.token().is_cancellation_requested() << "\n";
+            std::print("3. polling loop stopped, requested = {}\n", bool_str(cts.token().is_cancellation_requested()));
         }
     }
 
@@ -68,26 +72,25 @@ int main() {
 
         auto id1 = token.register_callback([&] { ++calls; });
         auto id2 = token.register_callback([&] { calls += 100; });
-        std::cout << "4. registered callbacks: " << token.registered_callback_count() << "\n";
+        std::print("4. registered callbacks: {}\n", token.registered_callback_count());
         (void)token.unregister_callback(id2);
 
         cts.cancel();
         cts.cancel(); // idempotent
         (void)id1;
         token.register_callback([&] { calls += 10; }); // already canceled: runs right away
-        std::cout << "   callback total = " << calls.load() << " (1 + 10)\n";
+        std::print("   callback total = {} (1 + 10)\n", calls.load());
     }
 
     // 5. A token that can never be canceled.
     {
         CancellationToken none = CancellationToken::none();
-        std::cout << "5. none() canceled? " << std::boolalpha << none.is_cancellation_requested() << "\n";
-        std::cout << "   sleep with none(): ";
+        std::print("5. none() canceled? {}\n", bool_str(none.is_cancellation_requested()));
         auto sleeper = [](CancellationToken t) -> Task<int> {
             co_await async_sleep(20ms, t);
             co_return 7;
         };
-        std::cout << sleeper(none).result() << "\n";
+        std::print("   sleep with none(): {}\n", sleeper(none).result());
     }
     return 0;
 }

@@ -1,10 +1,16 @@
 // Task<T> basics: eager start, co_await, blocking wait()/result(), exceptions, move-only results.
 #include <aw/tpl/tpl.hpp>
 
-#include <iostream>
+#include <atomic>
+#include <format>
 #include <memory>
+#include <print>
+#include <algorithm>
+#include <source_location>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
+#include <vector>
 
 using namespace std::chrono_literals;
 using namespace aw::tpl;
@@ -13,12 +19,14 @@ using namespace aw::tpl::threading::tasks;
 
 Task<int> square(int x) {
     co_await async_sleep(50ms);
-    co_return x* x;
+    co_return x * x;
 }
 
-Task<void> log_line(std::string text) {
+// Uses std::source_location to attach call site info to every log line.
+Task<void> log_line(std::string text,
+                    std::source_location loc = std::source_location::current()) {
     co_await async_sleep(10ms);
-    std::cout << "  log: " << text << "\n";
+    std::print("  log [{}:{}]: {}\n", loc.file_name(), loc.line(), text);
 }
 
 Task<int> always_fails() {
@@ -39,35 +47,49 @@ Task<int> chain() {
     co_return a + b;
 }
 
+// Helper: std::format<bool> prints "true"/"false" but we normalise to lowercase.
+inline std::string bool_str(bool v) { return std::format("{}", v ? "true" : "false"); }
+
+// Helper: uses if constexpr to handle std::atomic vs plain types uniformly.
+template <typename T>
+std::string to_printable(T const& v) {
+    if constexpr (std::is_same_v<std::remove_cvref_t<T>, std::atomic<int>>) {
+        return std::format("{}", v.load());
+    } else {
+        return std::format("{}", v);
+    }
+}
+
 int main() {
     // Tasks start eagerly on the thread pool; result() blocks the (non-pool) calling thread.
     Task<int> t = square(7);
-    std::cout << "square(7) = " << t.result() << "\n";
+    std::print("square(7) = {}\n", t.result());
 
     // Task<void> uses wait().
     log_line("hello from a Task<void>").wait();
 
     // Awaiting inside a coroutine.
-    std::cout << "chain() = " << chain().result() << "\n";
+    std::print("chain() = {}\n", chain().result());
 
     // A finished task can be read again (copyable results).
-    std::cout << "square(7) again = " << t.result() << "\n";
-    std::cout << "await_ready() after completion: " << std::boolalpha << t.await_ready() << "\n";
+    std::print("square(7) again = {}\n", t.result());
+    std::print("await_ready() after completion: {}\n", bool_str(t.await_ready()));
 
     // Exceptions travel through the Task.
     try {
         (void)always_fails().result();
     } catch (const std::runtime_error& ex) {
-        std::cout << "caught: " << ex.what() << "\n";
+        std::print("caught: {}\n", ex.what());
     }
 
     // Move-only results can be taken exactly once.
     auto p = make_unique_result();
-    std::cout << "unique_ptr value = " << *p.result() << "\n";
+    std::print("unique_ptr value = {}\n", *p.result());
     try {
         (void)p.result();
-    } catch (const TaskAlreadyMovedException& ex) {
-        std::cout << "second take throws: " << ex.what() << "\n";
+    } catch (const TaskAlreadyMovedException&) {
+        std::print("second take throws: {} (move-only)\n",
+                   std::source_location::current().function_name());
     }
 
     // A default-constructed (or moved-from) Task has no state and throws std::exception.
@@ -75,7 +97,20 @@ int main() {
     try {
         (void)empty.result();
     } catch (const std::exception& ex) {
-        std::cout << "empty task: " << ex.what() << "\n";
+        std::print("empty task: {}\n", ex.what());
     }
+
+    // std::ranges::for_each: print all results in one pass.
+    std::vector<int> vals = {7, 49, 121};
+    std::print("std::for_each:");
+    std::for_each(vals.begin(), vals.end(), [](int v) { std::print(" {}", v); });
+    std::print("\n");
+
+    // if constexpr helper: works with both atomic and plain types.
+    std::atomic<int> atomic_val{42};
+    int plain_val{99};
+    std::print("atomic via to_printable: {}\n", to_printable(atomic_val));
+    std::print("plain  via to_printable: {}\n", to_printable(plain_val));
+
     return 0;
 }

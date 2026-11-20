@@ -1,7 +1,7 @@
 // ThreadPool: the global pool, default thread count, and a private pool of your own.
 #include <aw/tpl/tpl.hpp>
 
-#include <iostream>
+#include <print>
 #include <thread>
 
 using namespace std::chrono_literals;
@@ -17,16 +17,16 @@ Task<int> work(int v) {
 int main() {
     // Must be called before the global pool is first used; afterwards it is ignored.
     ThreadPool::set_default_threads(4);
-    std::cout << "global pool threads: " << ThreadPool::global().thread_count() << "\n";
+    std::print("global pool threads: {}\n", ThreadPool::global().thread_count());
 
     // A coroutine started from a non-pool thread runs on the global pool.
-    std::cout << "work(1) = " << work(1).result() << "\n";
+    std::print("work(1) = {}\n", work(1).result());
 
     // Own pool: coroutines started *from a worker of this pool* (and their continuations,
     // timers and cancellations) stay on it. Task<>::run is the easy way to start such a coroutine.
     {
         ThreadPool pool(2);
-        std::cout << "private pool threads: " << pool.thread_count() << "\n";
+        std::print("private pool threads: {}\n", pool.thread_count());
     } // destruction resumes pending timers, drains queued work and joins every thread
 
     // Blocking on a pool worker is a bug and throws std::logic_error instead of deadlocking.
@@ -34,7 +34,7 @@ int main() {
         try {
             (void)work(1).result();
         } catch (const std::logic_error& ex) {
-            std::cout << "blocking on a worker: " << ex.what() << "\n";
+            std::print("blocking on a worker: {}\n", ex.what());
         }
         co_return;
     };

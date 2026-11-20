@@ -4,7 +4,7 @@ Guidance for working on `aw::tpl`. Read `README.md` for the user-facing API; thi
 
 ## Identity & philosophy
 
-`aw::tpl` is a zero-dependency C++20 library that brings the **C# / .NET Task Parallel Library** mental model to C++ coroutines: eager `Task<T>`/`Task<void>`, `ThreadPool`, `Task<>::run` (= `Task.Run`), `async_sleep` (= `Task.Delay`), `when_all`/`when_any` (= `Task.WhenAll`/`WhenAny`, the latter returning `Task<Task<T>>`), `CancellationToken(Source)`, `OperationCanceledException`/`TimeoutException`.
+`aw::tpl` is a zero-dependency C++23 library that brings the **C# / .NET Task Parallel Library** mental model to C++ coroutines: eager `Task<T>`/`Task<void>`, `ThreadPool`, `Task<>::run` (= `Task.Run`), `async_sleep` (= `Task.Delay`), `when_all`/`when_any` (= `Task.WhenAll`/`WhenAny`, the latter returning `Task<Task<T>>`), `CancellationToken(Source)`, `OperationCanceledException`/`TimeoutException`.
 
 When designing a feature:
 - Start from the .NET equivalent. Mirror its name (snake_cased), semantics, return types and exception behaviour; deviate only where C++ forces it, and say so in the Doxygen (`equivalent to C# @c Task.X`).
@@ -77,9 +77,9 @@ Namespaces map 1:1 to directories, mirroring .NET:
 - Inline `//` comments are **minimal**: use them only for non-obvious logic, subtle concurrency/lifetime/ordering reasons, or the *why* behind a choice (e.g. "threads are declared last so they are joined first"). Never narrate what the code obviously does (`// increment counter`, `// print to console`). Prefer better names over comments. Use `///` only for one-line member docs as in `thread_pool.hpp`.
 - Keep README tables/examples in sync when public behaviour changes.
 
-## C++20 conventions & style
+## C++23 conventions & style
 
-- Idiomatic modern C++20: concepts/`requires` over SFINAE (`requires std::invocable<Func>`, `requires (sizeof...(Ts) > 0)`), `if constexpr`, coroutines, `std::jthread`/`std::stop_token`, `std::binary_semaphore`, RAII everywhere (no raw `new`/`delete`, no manual lock/unlock — use `std::lock_guard`/`std::scoped_lock`).
+- Idiomatic modern C++23: concepts/`requires` over SFINAE (`requires std::invocable<Func>`, `requires (sizeof...(Ts) > 0)`), `if constexpr`, coroutines, `std::jthread`/`std::stop_token`, `std::binary_semaphore`, RAII everywhere (no raw `new`/`delete`, no manual lock/unlock — use `std::lock_guard`/`std::scoped_lock`). Prefer `std::ranges` algorithms (`std::ranges::for_each`, `std::ranges::find_if`, `std::ranges::remove_if`) over raw loops; use `std::format`/`std::print`, `std::source_location`, `std::span` bounds checking, and `std::to_underlying` where appropriate.
 - `[[nodiscard]]` on `Task` and on pure getters/factories; mark `noexcept` where truly non-throwing; `explicit` on single-arg constructors; delete copy where ownership is unique.
 - Naming: types `PascalCase`; functions/variables/files `snake_case`; private data members `trailing_underscore_`; plain `detail` structs use bare member names; namespaces lowercase. Exceptions derive from `std` exceptions and carry the .NET-style default message.
 - Formatting (see `.clang-format`, `.editorconfig`): 4 spaces, 120 cols, attached braces, `Type* p` / `Type& r`, `public:` flush with `class`, no indentation inside namespaces, closing comments `} // namespace aw::tpl`, constructor initializer lists break before `:`. Short `if (x) stmt;` and one-line inline accessors are fine.

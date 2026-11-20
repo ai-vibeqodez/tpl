@@ -1,6 +1,6 @@
 # CI: build + test on every pull request. The heavier checks (sanitizers, lint, coverage) live in test.yml.
 #
-# Linux jobs run inside ghcr.io/ai-warevo/ci-cpp20 (linux/amd64):
+# Linux jobs run inside ghcr.io/ai-warevo/ci-cpp23 (linux/amd64):
 #   gcc-15, clang-18 (libstdc++ + libc++), cmake, ninja, gcovr
 # MSVC runs on windows-latest (native runner).
 
@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  IMAGE: ghcr.io/ai-warevo/ci-cpp20
+  IMAGE: ghcr.io/ai-warevo/ci-cpp23
 
 jobs:
   # ────────────────────────────────────────────────────────────

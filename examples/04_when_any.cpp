@@ -3,7 +3,9 @@
 // the second co_await unwraps its value (or rethrows its exception).
 #include <aw/tpl/tpl.hpp>
 
-#include <iostream>
+#include <format>
+#include <memory>
+#include <print>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -33,6 +35,9 @@ Task<int> failing(std::chrono::milliseconds delay) {
     co_return 0;
 }
 
+// Helper: normalises bool to lowercase "true"/"false".
+inline std::string bool_str(bool v) { return std::format("{}", v ? "true" : "false"); }
+
 Task<void> app() {
     // 1. The classic C# pattern:
     //      using var cts = new CancellationTokenSource();
@@ -55,24 +60,24 @@ Task<void> app() {
 
         // Unwrap the result (or throw if the winning task failed).
         std::string result = co_await completed_task;
-        std::cout << "1. " << result << (completed_task == task2 ? " (task2 won)" : " (task1 won)") << "\n";
+        std::print("1. {}{} (task{} won)\n", result, bool_str(completed_task == task2), completed_task == task2 ? 2 : 1);
 
         try {
             (void)co_await task1; // the loser was canceled
         } catch (const OperationCanceledException&) {
-            std::cout << "   task1 was canceled\n";
+            std::print("   task1 was canceled\n");
         }
     }
 
     // 2. Vector overload: same shape, the winner is a Task<T> from the vector.
     {
-        std::vector<Task<int>> racers;
-        racers.push_back(number(100, 300ms));
-        racers.push_back(number(200, 40ms));
-        racers.push_back(number(300, 150ms));
+        std::vector<Task<int>> racers{
+            number(100, 300ms),
+            number(200, 40ms),
+            number(300, 150ms),
+        };
         Task<int> first = co_await when_any(racers);
-        std::cout << "2. winner is racers[1]? " << std::boolalpha << (first == racers[1])
-                  << ", value: " << co_await first << "\n";
+        std::print("2. winner is racers[1]? {}, value: {}\n", bool_str(first == racers[1]), co_await first);
     }
 
     // 3. Mixed result types give Task<Task<void>> (C# Task.WhenAny(params Task[]) -> Task<Task>).
@@ -83,21 +88,22 @@ Task<void> app() {
         Task<std::string> text = fetch_from_server("C", 200ms, CancellationToken::none());
 
         Task<void> winner = co_await when_any(slow, quick, text);
-        std::cout << "3. winner is `quick`? " << (winner == quick) << "\n";
+        std::print("3. winner is `quick`? {}\n", bool_str(winner == quick));
         co_await winner;               // observe completion / rethrow failure
         co_await when_all(slow, text); // the losers keep running; wait for them if you care
     }
 
     // 4. A failed task also counts as completed; the failure appears on the second await.
     {
-        std::vector<Task<int>> with_failure;
-        with_failure.push_back(number(1, 200ms));
-        with_failure.push_back(failing(10ms));
+        std::vector<Task<int>> with_failure{
+            number(1, 200ms),
+            failing(10ms),
+        };
         Task<int> completed = co_await when_any(with_failure); // does not throw
         try {
             (void)co_await completed; // throws here
         } catch (const std::runtime_error& ex) {
-            std::cout << "4. winner failed with: " << ex.what() << "\n";
+            std::print("4. winner failed with: {}\n", ex.what());
         }
         co_await nothing(200ms); // let the slow loser finish before leaving the scope
     }
@@ -106,7 +112,7 @@ Task<void> app() {
     try {
         (void)co_await when_any(std::vector<Task<int>>{});
     } catch (const std::invalid_argument& ex) {
-        std::cout << "5. empty vector: " << ex.what() << "\n";
+        std::print("5. empty vector: {}\n", ex.what());
     }
 }
 

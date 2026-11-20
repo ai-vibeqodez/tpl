@@ -1,6 +1,6 @@
 # ⚡ aw::tpl
 
-[![C++20](https://img.shields.io/badge/C++-%2300599C.svg?logo=c%2B%2B&logoColor=white)](https://cppreference.com)
+[![C++23](https://img.shields.io/badge/C++-%2300599C.svg?logo=c%2B%2B&logoColor=white)](https://cppreference.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <br />
 [![CI](https://github.com/ai-warevo/tpl/actions/workflows/ci.yml/badge.svg)](https://github.com/ai-warevo/tpl/actions/workflows/ci.yml)
@@ -8,16 +8,16 @@
 [![Tests](https://github.com/ai-warevo/tpl/actions/workflows/test.yml/badge.svg)](https://github.com/ai-warevo/tpl/actions/workflows/test.yml)
 [![Coverage](https://raw.githubusercontent.com/ai-warevo/tpl/refs/heads/badges/coverage.svg)](https://ai-warevo.github.io/tpl)
 
-> **C# Task Parallel Library (TPL) ergonomics brought to modern C++20 coroutines.**  
+> **C# Task Parallel Library (TPL) ergonomics brought to modern C++23 coroutines.**  
 > *Part of the **[ai-warevo](https://github.com/ai-warevo)** ecosystem — evoked into existence via prompt engineering.* 🪄
 
-`aw::tpl` is a lightweight, zero-dependency C++20 coroutine library providing eager `Task<T>`, a background `ThreadPool` with non-blocking async timers, `when_all`, `when_any`, `Task<>::run`, and cooperative `CancellationToken` support.
+`aw::tpl` is a lightweight, zero-dependency C++23 coroutine library providing eager `Task<T>`, a background `ThreadPool` with non-blocking async timers, `when_all`, `when_any`, `Task<>::run`, and cooperative `CancellationToken` support.
 
 ## ✨ Features
 
 * **Eager Coroutines (`Task<T>` / `Task<void>`):** Tasks start executing immediately on the thread pool upon invocation — just like `System.Threading.Tasks.Task` in C#.
 * **Thread Pool Offloading (`Task<>::run`):** Safely execute synchronous or capturing lambdas on worker threads (`Task<>::run([&] { ... })`, equivalent to `Task.Run`).
-* **Clean Synchronization:** `.result()` for `Task<T>` and `.wait()` for `Task<void>` enforced at compile time via C++20 `requires`.
+* **Clean Synchronization:** `.result()` for `Task<T>` and `.wait()` for `Task<void>` enforced at compile time via C++23 `requires`.
 * **Non-Blocking Timers (`async_sleep`):** Dedicated timer thread with a min-heap priority queue — 10,000 concurrent delays never block worker threads.
 * **Combinators (`when_all` & `when_any`):** Supports both heterogeneous variadic tasks and homogeneous `std::vector<Task<T>>`. `when_any` returns `Task<Task<T>>` exactly like .NET's `Task.WhenAny`.
 * **Cooperative Cancellation & Timeouts:** `CancellationTokenSource` & `CancellationToken` with `.cancel()`, `.cancel_after()`, `CancellationTokenSource(timeout)`, `OperationCanceledException` and `TimeoutException`.
@@ -160,7 +160,7 @@ Every part of the public API is shown in [`examples/`](examples):
 | [`07_timeout.cpp`](examples/07_timeout.cpp) | `CancellationTokenSource(timeout)`, `OperationCanceledException` → `TimeoutException` |
 | [`08_co_spawn.cpp`](examples/08_co_spawn.cpp) | `co_spawn` fire-and-forget, error handler, `TaskGroup` draining |
 
-## ⚠️ C++20 Coroutine Lifetime Note
+## ⚠️ C++23 Coroutine Lifetime Note
 
 Per **C++ Core Guidelines (CP.51)**, avoid invoking capturing coroutine lambdas immediately (`[&]() -> Task<void> { co_await ...; }()`), as the temporary lambda closure is destroyed at the semicolon before the coroutine resumes. Instead:
 * Pass state as explicit function/lambda parameters: `[](int& x) -> Task<void> { ... }(x)`, **or**

@@ -2,6 +2,8 @@
 
 #include <aw/tpl/threading/detail/pool_scheduling.hpp>
 
+#include <algorithm>
+#include <ranges>
 #include <stdexcept>
 #include <utility>
 
@@ -28,9 +30,9 @@ void TaskGroup::done() {
         }
     }
     // `this` is not touched below: the group may already be gone.
-    for (auto h : to_resume) {
+    std::ranges::for_each(to_resume, [](std::coroutine_handle<> h) {
         threading::detail::schedule_on_pool(h);
-    }
+    });
 }
 
 std::size_t TaskGroup::pending() const {

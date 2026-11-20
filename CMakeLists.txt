@@ -20,16 +20,16 @@ option(AW_TPL_BUILD_EXAMPLES "Build aw::tpl example applications" ${AW_TPL_IS_TO
 
 find_package(Threads REQUIRED)
 
-# Fail early with a readable message when the toolchain lacks the C++20 library/coroutine support we need.
+# Fail early with a readable message when the toolchain lacks the C++23 library/coroutine support we need.
 include(CheckCXXSourceCompiles)
 set(CMAKE_REQUIRED_FLAGS "")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11)
-    set(CMAKE_REQUIRED_FLAGS "-std=c++20 -fcoroutines")
+    set(CMAKE_REQUIRED_FLAGS "-std=c++23 -fcoroutines")
     set(AW_TPL_NEEDS_FCOROUTINES ON)
 elseif(MSVC)
-    set(CMAKE_REQUIRED_FLAGS "/std:c++20 /EHsc")
+    set(CMAKE_REQUIRED_FLAGS "/std:c++23 /EHsc")
 else()
-    set(CMAKE_REQUIRED_FLAGS "-std=c++20")
+    set(CMAKE_REQUIRED_FLAGS "-std=c++23")
 endif()
 # libc++ (up to at least 18) ships std::jthread / std::stop_token only behind -fexperimental-library.
 set(AW_TPL_NEEDS_EXPERIMENTAL_LIBRARY OFF)
@@ -70,8 +70,8 @@ int main() {
 unset(CMAKE_REQUIRED_FLAGS)
 unset(CMAKE_REQUIRED_LIBRARIES)
 if(NOT AW_TPL_HAS_CXX20_RUNTIME)
-    message(FATAL_ERROR "aw::tpl needs a C++20 toolchain with coroutines, std::jthread, std::stop_token and std::binary_semaphore "
-                        "(GCC >= 11, Clang >= 14 with a recent libc++/libstdc++, or MSVC 2022).")
+    message(FATAL_ERROR "aw::tpl needs a C++23 toolchain with coroutines, std::jthread, std::stop_token and std::binary_semaphore "
+                        "(GCC >= 13, Clang >= 17 with a recent libc++/libstdc++, or MSVC 2022 17.10+).")
 endif()
 
 add_library(aw_tpl STATIC
@@ -98,7 +98,7 @@ add_library(aw_tpl STATIC
 )
 add_library(aw::tpl ALIAS aw_tpl)
 
-target_compile_features(aw_tpl PUBLIC cxx_std_20)
+target_compile_features(aw_tpl PUBLIC cxx_std_23)
 
 option(AW_TPL_WARNINGS_AS_ERRORS "Build the aw_tpl library with strict warnings treated as errors" OFF)
 if(AW_TPL_WARNINGS_AS_ERRORS)
