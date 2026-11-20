@@ -14,6 +14,17 @@ Maintainer notes (see AGENTS.md, "Changelog & releases"):
 
 ## [Unreleased]
 
+### Added
+
+- exception reason metadata: `OperationCanceledException`, `TaskAlreadyMovedException` and `TimeoutException` gain a `reason` constructor and an `exception_reason()` accessor for structured diagnostics
+- lock-free `await_ready()`: `TaskStateBase::ready` is now `std::atomic<bool>`, so completion polling no longer acquires the state mutex (release/acquire preserves the exception/result happens-before)
+
+### Changed
+
+- cancellation callbacks are stored as `std::move_only_function<void()>`, avoiding `std::function`'s copy semantics and potential heap allocation on the cancellation hot path
+- move-only result extraction is guarded by the state mutex instead of a separate atomic flag, removing one synchronization primitive per task
+- cancellation callback execution uses `std::ranges` idioms and collects every callback failure instead of only the first (rethrow behavior is unchanged: the first exception wins)
+
 ## [4.1.0] - 2026-11-18
 
 ### Added
@@ -35,24 +46,6 @@ Maintainer notes (see AGENTS.md, "Changelog & releases"):
 ### Fixed
 
 - scripts
-- scripts
-- use inline CMake commands for Windows/MSVC jobs
-
-### Changed
-
-- add MSVC support to CI/CD workflows
-- run all jobs inside ghcr.io/ai-warevo/ci-cpp23 container
-- align tpl workflows with tobus pattern, fix ASAN_OPTIONS
-- add setup-toolchain (clang18-libcxx, gcc15, msvc) to CI matrix
-
-## [Unreleased]
-
-### Breaking
-
-- derive custom exceptions from std::exception to fix ASan mismatch
-
-### Fixed
-
 - scripts
 - use inline CMake commands for Windows/MSVC jobs
 
