@@ -62,6 +62,8 @@ public:
     /**
      * @brief Checks whether the task has already finished without suspending.
      * @return True if result is already available.
+     * @note Uses a lock-free acquire load: this is an optimization that avoids mutex contention
+     *       on the common fast path where the task is already complete.
      */
     [[nodiscard]] bool await_ready() const { return !state_ || state_->is_ready(); }
 

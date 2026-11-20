@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <coroutine>
 #include <exception>
 #include <mutex>
@@ -19,7 +20,13 @@ namespace aw::tpl::threading::tasks::detail {
  */
 struct TaskStateBase {
     std::mutex mtx;
-    bool ready = false;
+    /**
+     * @brief Completion flag. Atomic so awaiters can poll it without acquiring @c mtx
+     *        (a false is always safe: they fall back to the locked suspend path).
+     *        Writers publish it with release inside @c finish() so that an acquire load
+     *        that observes true also observes @c exception and (in derived states) @c value.
+     */
+    std::atomic<bool> ready{false};
     std::vector<std::coroutine_handle<>> continuations;
     std::exception_ptr exception = nullptr;
     std::binary_semaphore done_sem{0};

@@ -18,13 +18,12 @@ TaskStateBase::~TaskStateBase() {
 }
 
 bool TaskStateBase::is_ready() {
-    std::lock_guard lock(mtx);
-    return ready;
+    return ready.load(std::memory_order_acquire);
 }
 
 bool TaskStateBase::try_attach_continuation(std::coroutine_handle<> awaiting) {
     std::lock_guard lock(mtx);
-    if (ready) {
+    if (ready.load(std::memory_order_relaxed)) {
         return false;
     }
     continuations.push_back(awaiting);
@@ -42,7 +41,7 @@ std::coroutine_handle<> TaskStateBase::finish() {
     std::vector<std::coroutine_handle<>> to_resume;
     {
         std::lock_guard lock(mtx);
-        ready = true;
+        ready.store(true, std::memory_order_release);
         to_resume = std::move(continuations);
         continuations.clear();
     }
