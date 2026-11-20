@@ -17,7 +17,7 @@ namespace aw::tpl::threading::detail {
 struct CancellationState {
     std::atomic<bool> canceled{false};
     std::mutex mtx;
-    std::vector<std::pair<std::uint64_t, std::function<void()>>> callbacks;
+    std::vector<std::pair<std::uint64_t, std::move_only_function<void()>>> callbacks;
     std::uint64_t next_id = 1;
 
     /**
@@ -31,7 +31,7 @@ struct CancellationState {
      * @param[in] cb Callable invoked on cancellation.
      * @return Registration id (> 0), or 0 if the callback was executed immediately.
      */
-    std::uint64_t register_callback(std::function<void()> cb);
+    std::uint64_t register_callback(std::move_only_function<void()> cb);
 
     /**
      * @brief Removes a previously registered callback.

@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!--
-Maintainer notes (see CLAUDE.md, "Changelog & releases"):
+Maintainer notes (see AGENTS.md, "Changelog & releases"):
 - Add every user-visible change under `## [Unreleased]` in the same commit that makes it.
 - Categories: Breaking, Added, Changed, Deprecated, Removed, Fixed, Security. Omit empty ones.
 - scripts/release.sh / scripts/release.ps1 derive the next version from those categories.
@@ -112,7 +112,7 @@ Maintainer notes (see CLAUDE.md, "Changelog & releases"):
 - Examples `01_tasks_basics` to `07_timeout` in `examples/`, replacing the single demo.
 - Build options `AW_TPL_SANITIZE=address|thread` and `AW_TPL_WARNINGS_AS_ERRORS`, plus a configure-time check of the
   C++23 toolchain.
-- Sanitizer (ASan/UBSan, TSan) jobs in CI; `.clang-format`, `.clang-tidy`, `.editorconfig` and `CLAUDE.md`.
+- Sanitizer (ASan/UBSan, TSan) jobs in CI; `.clang-format`, `.clang-tidy`, `.editorconfig` and `AGENTS.md`.
 - README sections on `when_any`, timeouts, project layout and the threading and lifetime contract.
 
 ### Changed
