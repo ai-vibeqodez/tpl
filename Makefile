@@ -13,16 +13,16 @@ PRESET     := $(if $(filter Release,$(BUILD_TYPE)),release,debug)
 .PHONY: build test lint format clean
 
 build:
-	cmake --preset $(PRESET)
-	cmake --build --preset $(PRESET)
+	cmake -B build/$(PRESET) -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+	cmake --build build/$(PRESET)
 
 test: build
-	@if [ -f tests/CMakeLists.txt ]; then ctest --preset $(PRESET); \
+	@if [ -f tests/CMakeLists.txt ]; then ctest --test-dir build/$(PRESET) --output-on-failure --parallel 4; \
 	else echo "No tests/ directory."; fi
 
 lint: build
 	@if command -v clang-tidy >/dev/null 2>&1; then \
-	    find include src -name '*.hpp' -o -name '*.cpp' | xargs clang-tidy -p build/$(PRESET); \
+	    find include src -name '*.hpp' -o -name '*.cpp' | xargs clang-tidy -p build/$(PRESET) --warnings-as-errors='*'; \
 	else echo "clang-tidy not found"; fi
 
 format:
