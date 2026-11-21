@@ -6,6 +6,8 @@ include(FetchContent)
 FetchContent_Declare(
     aw_cmake_modules
     SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../template-cpp
+    GIT_REPOSITORY https://github.com/ai-warevo/template_cpp
+    GIT_TAG main
 )
 
 FetchContent_MakeAvailable(aw_cmake_modules)
