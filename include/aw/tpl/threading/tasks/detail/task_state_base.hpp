@@ -3,6 +3,7 @@
 #include <atomic>
 #include <coroutine>
 #include <exception>
+#include <functional>
 #include <mutex>
 #include <semaphore>
 #include <vector>
@@ -28,6 +29,8 @@ struct TaskStateBase {
      */
     std::atomic<bool> ready{false};
     std::vector<std::coroutine_handle<>> continuations;
+    /// Fire-and-forget callbacks invoked once on completion; used by when_any optimization.
+    std::vector<std::move_only_function<void()>> completion_callbacks;
     std::exception_ptr exception = nullptr;
     std::binary_semaphore done_sem{0};
 
@@ -57,6 +60,15 @@ struct TaskStateBase {
      * @return True if suspended and @p awaiting will be resumed later; false if already ready.
      */
     bool try_attach_continuation(std::coroutine_handle<> awaiting);
+
+    /**
+     * @brief Registers a completion callback if the task is not yet complete.
+     *        The callback is invoked exactly once when the task finishes, outside any locks.
+     *        Used by when_any to attach direct notifications without spawning watcher coroutines.
+     * @param[in] callback Invoked with no arguments; must not block or throw.
+     * @return True if registered (callback will fire later); false if already ready (caller must handle).
+     */
+    bool try_attach_completion_callback(std::move_only_function<void()> callback);
 
     /**
      * @brief @c await_suspend helper: attaches @p awaiting or hands it straight back when already ready.

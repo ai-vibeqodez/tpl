@@ -3,7 +3,6 @@
 #include <aw/tpl/threading/tasks/task.hpp>
 #include <aw/tpl/threading/tasks/detail/when_any_awaiter.hpp>
 #include <aw/tpl/threading/tasks/detail/when_any_state.hpp>
-#include <aw/tpl/threading/tasks/detail/when_any_watcher.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -42,8 +41,39 @@ Task<Task<T>> when_any(std::vector<Task<T>> tasks) {
     }
 
     auto state = std::make_shared<detail::WhenAnyState>();
+
+    // Directly attach a completion callback to each task instead of spawning N watcher coroutines.
+    // When any task completes, its callback tries to win the race via state->try_complete(index).
     for (std::size_t i = 0; i < tasks.size(); ++i) {
-        detail::spawn_when_any_watcher(tasks[i].completion(), i, state);
+        auto task_state = tasks[i].get_internal_state();
+        if (!task_state) {
+            // Empty task; treat as immediately ready and mark as winner.
+            state->winner_index = i;
+            state->completed.store(true, std::memory_order_release);
+            co_return tasks[i];
+        }
+
+        // If the task is already complete, try to claim the win immediately.
+        if (task_state->is_ready()) {
+            if (state->try_complete(i)) {
+                // This index won; short-circuit.
+                co_return tasks[i];
+            }
+            // Another task already won the race; continue checking the rest.
+            continue;
+        }
+
+        // Attach a callback that tries to complete the when_any state when this task finishes.
+        std::size_t index = i;
+        auto when_any_state = state;
+        bool attached = task_state->try_attach_completion_callback([index, when_any_state]() {
+            when_any_state->try_complete(index);
+        });
+
+        // If attachment failed (task completed concurrently), try to claim the win.
+        if (!attached && state->try_complete(i)) {
+            co_return tasks[i];
+        }
     }
 
     const std::size_t winner = co_await detail::WhenAnyAwaiter{state};

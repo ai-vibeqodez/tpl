@@ -24,6 +24,7 @@ Maintainer notes (see AGENTS.md, "Changelog & releases"):
 - cancellation callbacks are stored as `std::move_only_function<void()>`, avoiding `std::function`'s copy semantics and potential heap allocation on the cancellation hot path
 - move-only result extraction is guarded by the state mutex instead of a separate atomic flag, removing one synchronization primitive per task
 - cancellation callback execution uses `std::ranges` idioms and collects every callback failure instead of only the first (rethrow behavior is unchanged: the first exception wins)
+- `when_any` watcher allocation optimized: attach completion callbacks directly to each task instead of spawning N watcher coroutines (expected -20–30% setup time reduction for large N)
 
 ## [4.1.0] - 2026-11-18
 

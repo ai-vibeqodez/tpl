@@ -132,6 +132,14 @@ public:
         return detail::run_async(std::move(fn));
     }
 
+    /**
+     * @brief Extracts the internal shared state (detail access for combinators).
+     * @return The shared state, or null if the task is default-constructed/moved-from.
+     */
+    [[nodiscard]] std::shared_ptr<detail::TaskStateBase> get_internal_state() const noexcept {
+        return state_;
+    }
+
 private:
     template <typename>
     friend class Task;
