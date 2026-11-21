@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Maintainer notes (see AGENTS.md, "Changelog & releases"):
 - Add every user-visible change under `## [Unreleased]` in the same commit that makes it.
 - Categories: Breaking, Added, Changed, Deprecated, Removed, Fixed, Security. Omit empty ones.
-- scripts/release.sh / scripts/release.ps1 derive the next version from those categories.
+- The CI release workflow derives the next version from those categories.
 -->
 
 ## [Unreleased]

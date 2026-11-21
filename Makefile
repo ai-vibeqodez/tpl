@@ -11,7 +11,7 @@
 BUILD_TYPE ?= Debug
 PRESET     := $(if $(filter Release,$(BUILD_TYPE)),release,debug)
 
-.PHONY: test demo lint format clean release release-dry-run changelog changelog-dry-run
+.PHONY: test demo lint format clean
 
 # Configure, build, and run tests only
 build:
@@ -34,25 +34,6 @@ demo:
 clean:
 	rm -rf build
 
-# Cut a SemVer release from CHANGELOG.md [Unreleased]: bump, commit, tag. `make release PUSH=1` also pushes.
-# Detect POSIX shell: MSYS2/MinGW/Cygwin/WSL all have /usr/bin.
-# Only pure Windows (no /usr/bin) falls back to PowerShell.
-IS_POSIX := $(strip $(if $(wildcard /usr/bin),1,))
-
-release:
-ifneq ($(IS_POSIX),1)
-	powershell -NoProfile -ExecutionPolicy Bypass -File scripts/release.ps1 $(if $(PUSH),-Push)
-else
-	bash scripts/release.sh $(if $(PUSH),--push)
-endif
-
-release-dry-run:
-ifneq ($(IS_POSIX),1)
-	powershell -NoProfile -ExecutionPolicy Bypass -File scripts/release.ps1 -DryRun
-else
-	bash scripts/release.sh --dry-run
-endif
-
 lint: build
 	@if command -v clang-tidy >/dev/null 2>&1; then \
 	    find include src -name '*.hpp' -o -name '*.cpp' | xargs clang-tidy -p build/$(PRESET); \
@@ -62,20 +43,5 @@ format:
 	@if command -v clang-format >/dev/null 2>&1; then \
 	    find include src examples tests -name '*.hpp' -o -name '*.cpp' 2>/dev/null | xargs clang-format -i; \
 	else echo "clang-format not found (>= 15 required)"; fi
-
-# Cut changelog from git log (conventional commits). `make changelog FORCE=1` forces even if [Unreleased] is empty.
-changelog:
-ifneq ($(IS_POSIX),1)
-	powershell -NoProfile -ExecutionPolicy Bypass -File scripts/changelog-update.ps1 $(if $(FORCE),-Force)
-else
-	bash scripts/changelog-update.sh $(if $(FORCE),--force)
-endif
-
-changelog-dry-run:
-	ifneq ($(IS_POSIX),1)
-		powershell -NoProfile -ExecutionPolicy Bypass -File scripts/changelog-update.ps1 -DryRun
-	else
-		bash scripts/changelog-update.sh --dry-run
-	endif
 
 

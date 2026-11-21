@@ -29,23 +29,14 @@ ctest --test-dir build/dev -R "when_any" --output-on-failure      # subset (Catc
 
 ## Changelog & releases
 
-`CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com) and SemVer. It is the single source of release notes: the CI `release` job (`.github/workflows/ci.yml`) extracts the `## [X.Y.Z]` section matching the pushed tag and appends the prebuilt-SDK / `FetchContent` snippet, and fails if the section is missing.
+`CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com) and SemVer. It is the single source of release notes: the CI `release` workflow (`.github/workflows/release.yml`) derives the version, promotes `[Unreleased]`, commits `CHANGELOG.md` + `VERSION`, creates the tag, and publishes the GitHub release with notes extracted from the changelog section.
 
 - **Every user-visible change adds a bullet under `## [Unreleased]` in the same commit** (public API, behaviour, build options, CI/tooling users see). Skip pure refactors and tests with no visible effect. One line per change, imperative, backticks for identifiers.
 - **Categories** (omit empty ones, spell exactly): `Breaking` (API/ABI/header/namespace breaks; custom heading, not in the Keep a Changelog spec), `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`.
-- **Version bump** is derived from the categories that have entries, highest wins: `Breaking`/`Removed` → major, `Added`/`Deprecated` → minor, `Fixed`/`Changed`/`Security` → patch. A bullet under the wrong category therefore bumps the wrong number; entries outside a `###` category or unknown categories make the scripts abort.
-- Don't hand-edit released sections, dates or the compare links at the bottom; the scripts maintain them. Keep `[Unreleased]` at the top, newest release first.
+- **Version bump** is derived from the categories that have entries, highest wins: `Breaking`/`Removed` → major, `Added`/`Deprecated` → minor, `Fixed`/`Changed`/`Security` → patch. A bullet under the wrong category therefore bumps the wrong number; entries outside a `###` category or unknown categories make the CI workflow abort.
+- Don't hand-edit released sections, dates or the compare links at the bottom; the CI maintains them. Keep `[Unreleased]` at the top, newest release first.
 
-Release helpers (equivalent behaviour; run from anywhere inside the repo, never edit them without keeping both in sync and re-testing both):
-
-```sh
-scripts/release.sh [--dry-run] [--push]          # Linux/macOS (bash >= 3.2)
-./scripts/release.ps1 [-DryRun] [-Push]          # Windows PowerShell 5.1+ / pwsh
-make release-dry-run                              # picks the right script per OS
-make release [PUSH=1]
-```
-
-They print the detected categories and next `vX.Y.Z`, then promote `[Unreleased]` to `## [X.Y.Z] - <today>` (empty categories dropped, compare links updated, file's LF/CRLF endings kept), write the bare `X.Y.Z` (no `v`, trailing newline) to the root `VERSION` file, commit **only** `CHANGELOG.md` + `VERSION` as `release vX.Y.Z`, and create the annotated tag `vX.Y.Z`. They refuse to run with an empty `[Unreleased]`, an existing tag, staged changes, or uncommitted tracked files other than those two. `--push`/`-Push` runs `git push --atomic $RELEASE_REMOTE(origin) HEAD refs/tags/vX.Y.Z`; pushing the tag is what triggers the GitHub release. `VERSION` is the single source of the version: `CMakeLists.txt` reads it with `file(READ ...)` into `project(tpl VERSION ...)` (and re-configures when it changes), so never hard-code the version in CMake or edit `VERSION` by hand outside a release.
+**Releasing:** trigger the `release` workflow via manual dispatch (GitHub Actions UI) or push a tag matching `v*`. The workflow generates the changelog from git log (if running on workflow_dispatch), promotes `[Unreleased]` to `## [X.Y.Z] - <today>` (empty categories dropped, compare links updated), writes `X.Y.Z` to `VERSION`, commits both files as `release vX.Y.Z`, and creates the annotated tag. `VERSION` is the single source of the version: `CMakeLists.txt` reads it with `file(READ ...)` into `project(tpl VERSION ...)` (and re-configures when it changes), so never hard-code the version in CMake or edit `VERSION` by hand.
 
 ## Testing discipline
 
