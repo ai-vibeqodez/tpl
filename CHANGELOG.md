@@ -14,6 +14,36 @@ Maintainer notes (see AGENTS.md, "Changelog & releases"):
 
 ## [Unreleased]
 
+## [4.2.1] - 2026-11-21
+
+### Changed
+
+- fix cmake
+- remove local cmake/ duplication, fetch from template-cpp
+- Merge pull request #7 from ai-vibeqodez/loktionov129-patch-3
+- Update README.md
+- Merge branch 'main' of github.com:ai-warevo/tpl
+- fix
+- Merge pull request #5 from ai-warevo/loktionov129-patch-2
+- Update README.md
+- Create README.md
+- Update README.md
+- Merge pull request #4 from ai-vibeqodez/fix/ci-badge-and-sanitizer-comment
+- Update pr-test.yml
+- ci
+- fix
+- update badges to reflect new CI wrapper workflows
+
+### Fixed
+
+- refac c++23
+- conditional std::move_only_function for clang-18/libc++ compatibility
+- escape + in CMake regex for -stdlib=libc++ match
+- remove push trigger from pr-test.yml to avoid concurrency deadlock
+- CI badge and comment — point to correct workflow, note sanitizer fix
+- cmake
+- Merge branch 'main' of github.com:ai-warevo/tpl
+
 ## [4.2.0] - 2026-11-21
 
 ### Added
@@ -163,7 +193,8 @@ Maintainer notes (see AGENTS.md, "Changelog & releases"):
 - `CancellationTokenSource`, `CancellationToken`, `cancel_after` and `OperationCanceledException`.
 - CMake package (`find_package(aw_tpl)` / `FetchContent`) and CI on Windows, Linux and macOS with GitHub Releases.
 
-[Unreleased]: https://github.com/ai-warevo/tpl/compare/v4.2.0...HEAD
+[Unreleased]: https://github.com/ai-warevo/tpl/compare/v4.2.1...HEAD
+[4.2.1]: https://github.com/ai-warevo/tpl/compare/v4.2.0...v4.2.1
 [4.2.0]: https://github.com/ai-warevo/tpl/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/ai-warevo/tpl/compare/v4.0.1...v4.1.0
 [4.0.1]: https://github.com/ai-warevo/tpl/compare/v4.0.0...v4.0.1
