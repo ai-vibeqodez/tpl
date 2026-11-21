@@ -1,0 +1,36 @@
+# Release — promote changelog and publish GitHub Release
+#
+# Triggered on:
+#   - Tag push (v*)
+#   - Manual workflow_dispatch for dry-run or override version
+#
+# Delegates to reusable-release.yml for version derivation, changelog promotion,
+# and release publication. The aw::tpl project build is minimal (no Docker);
+# the release job simply publishes the changelog-derived version.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version override (X.Y.Z); use auto to derive from CHANGELOG.md'
+        required: false
+        default: auto
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  release:
+    uses: ai-warevo/.github/.github/workflows/reusable-release.yml@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
+    with:
+      version: ${{ inputs.version || 'auto' }}
+    permissions:
+      contents: write
+      actions: write

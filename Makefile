@@ -11,7 +11,7 @@
 BUILD_TYPE ?= Debug
 PRESET     := $(if $(filter Release,$(BUILD_TYPE)),release,debug)
 
-.PHONY: test demo lint format clean release release-dry-run changelog changelog-dry-run update
+.PHONY: test demo lint format clean release release-dry-run changelog changelog-dry-run update pr-fast weekly-deep
 
 # Configure, build, and run tests only
 build:
@@ -20,6 +20,32 @@ build:
 
 test: build
 	ctest --preset $(PRESET)
+
+# ────────────────────────────────────────────────────────────────────────────
+# CI Contract targets (for GitHub Actions reusable workflows)
+# ────────────────────────────────────────────────────────────────────────────
+
+# pr-fast: quick lint + build + unit tests (called by reusable-pr-fast.yml)
+pr-fast: lint test
+	@echo "✓ PR checks passed"
+
+# weekly-deep: sanitizers, stress tests, coverage (called by reusable-weekly-deep.yml)
+weekly-deep: clean
+	@# ASan + UBSan build
+	cmake --preset debug -DAW_TPL_SANITIZE=address
+	cmake --build --preset debug --parallel
+	ASAN_OPTIONS=alloc_dealloc_mismatch=0:detect_leaks=1 ctest --preset debug --output-on-failure
+	@# TSan build (separate from ASan)
+	rm -rf build/debug
+	cmake --preset debug -DAW_TPL_SANITIZE=thread
+	cmake --build --preset debug --parallel
+	ctest --preset debug --output-on-failure
+	@# Coverage build
+	rm -rf build/debug
+	cmake --preset debug -DAW_TPL_ENABLE_COVERAGE=ON
+	cmake --build --preset debug --parallel
+	ctest --preset debug --output-on-failure
+	@echo "✓ Deep checks passed"
 
 # Configure, build, and run every example in examples/
 demo:

@@ -47,13 +47,13 @@ jobs:
 
       - name: Setup toolchain
         id: tc
-        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
+        uses: ai-warevo/.github/.github/actions/setup-toolchain@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           toolchain: ${{ matrix.toolchain }}
           container_mode: true
 
       - name: Configure & Build
-        uses: ai-warevo/.github/ci/actions/cmake-build@main
+        uses: ai-warevo/.github/.github/actions/cmake-build@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           source_dir: .
           build_dir: build
@@ -66,7 +66,7 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=install
 
       - name: Run Tests
-        uses: ai-warevo/.github/ci/actions/ctest-run@main
+        uses: ai-warevo/.github/.github/actions/ctest-run@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           source_dir: .
           build_dir: build
@@ -82,7 +82,7 @@ jobs:
           done
 
       - name: Install
-        uses: ai-warevo/.github/ci/actions/cmake-build@main
+        uses: ai-warevo/.github/.github/actions/cmake-build@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           install: 'true'
 
@@ -154,20 +154,20 @@ jobs:
 
       - name: Setup toolchain
         id: tc
-        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
+        uses: ai-warevo/.github/.github/actions/setup-toolchain@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           toolchain: ${{ matrix.toolchain }}
           container_mode: true
 
       - name: Configure & Build
-        uses: ai-warevo/.github/ci/actions/cmake-build@main
+        uses: ai-warevo/.github/.github/actions/cmake-build@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           extra_args: >-
             ${{ steps.tc.outputs.cmake_args }}
             -DAW_TPL_WARNINGS_AS_ERRORS=ON
 
       - name: Run Tests
-        uses: ai-warevo/.github/ci/actions/ctest-run@main
+        uses: ai-warevo/.github/.github/actions/ctest-run@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           output_on_failure: true
           timeout: 120

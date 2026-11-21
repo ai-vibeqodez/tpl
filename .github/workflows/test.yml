@@ -48,7 +48,7 @@ jobs:
           clang-tidy --version | head -1
 
       - name: clang-format (.hpp)
-        uses: ai-warevo/.github/ci/actions/clang-format@main
+        uses: ai-warevo/.github/.github/actions/clang-format@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           source_dir: .
           extensions: hpp
@@ -56,7 +56,7 @@ jobs:
           exclude: _deps/*,build/*,CMakeFiles/*,cmake/*
 
       - name: clang-format (.cpp)
-        uses: ai-warevo/.github/ci/actions/clang-format@main
+        uses: ai-warevo/.github/.github/actions/clang-format@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           source_dir: .
           extensions: cpp
@@ -65,13 +65,13 @@ jobs:
 
       - name: Setup toolchain
         id: tc
-        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
+        uses: ai-warevo/.github/.github/actions/setup-toolchain@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           toolchain: clang18-libcxx
           container_mode: true
 
       - name: Configure & Build
-        uses: ai-warevo/.github/ci/actions/cmake-build@main
+        uses: ai-warevo/.github/.github/actions/cmake-build@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           source_dir: .
           build_dir: build
@@ -81,7 +81,7 @@ jobs:
             -DAW_TPL_BUILD_TESTS=ON
 
       - name: Run clang-tidy
-        uses: ai-warevo/.github/ci/actions/clang-tidy@main
+        uses: ai-warevo/.github/.github/actions/clang-tidy@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           source_dir: .
           build_dir: build
@@ -123,14 +123,14 @@ jobs:
 
       - name: Setup toolchain
         id: tc
-        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
+        uses: ai-warevo/.github/.github/actions/setup-toolchain@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           toolchain: ${{ matrix.toolchain }}
           sanitizer: ${{ matrix.sanitizer }}
           container_mode: true
 
       - name: Configure & Build
-        uses: ai-warevo/.github/ci/actions/cmake-build@main
+        uses: ai-warevo/.github/.github/actions/cmake-build@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           source_dir: .
           build_dir: build
@@ -142,7 +142,7 @@ jobs:
             -DAW_TPL_SANITIZE=${{ matrix.sanitizer }}
 
       - name: Run Tests
-        uses: ai-warevo/.github/ci/actions/ctest-run@main
+        uses: ai-warevo/.github/.github/actions/ctest-run@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           source_dir: .
           build_dir: build
@@ -169,13 +169,13 @@ jobs:
 
       - name: Setup toolchain
         id: tc
-        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
+        uses: ai-warevo/.github/.github/actions/setup-toolchain@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           toolchain: ${{ matrix.toolchain }}
           container_mode: true
 
       - name: Configure & Build
-        uses: ai-warevo/.github/ci/actions/cmake-build@main
+        uses: ai-warevo/.github/.github/actions/cmake-build@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           source_dir: .
           build_dir: build
@@ -183,7 +183,7 @@ jobs:
           extra_args: ${{ steps.tc.outputs.cmake_args }}
 
       - name: Repeat the concurrency tests
-        uses: ai-warevo/.github/ci/actions/ctest-run@main
+        uses: ai-warevo/.github/.github/actions/ctest-run@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           source_dir: .
           build_dir: build
@@ -206,13 +206,13 @@ jobs:
 
       - name: Setup toolchain
         id: tc
-        uses: ai-warevo/.github/ci/actions/setup-toolchain@main
+        uses: ai-warevo/.github/.github/actions/setup-toolchain@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           toolchain: gcc15
           container_mode: true
 
       - name: Configure & Build
-        uses: ai-warevo/.github/ci/actions/cmake-build@main
+        uses: ai-warevo/.github/.github/actions/cmake-build@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           source_dir: .
           build_dir: build
@@ -222,7 +222,7 @@ jobs:
             -DAW_TPL_ENABLE_COVERAGE=ON
 
       - name: Run Tests
-        uses: ai-warevo/.github/ci/actions/ctest-run@main
+        uses: ai-warevo/.github/.github/actions/ctest-run@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           source_dir: .
           build_dir: build
@@ -231,7 +231,7 @@ jobs:
 
       - name: Generate Coverage Reports (XML & HTML)
         id: gcovr
-        uses: ai-warevo/.github/ci/actions/gcovr-report@main
+        uses: ai-warevo/.github/.github/actions/gcovr-report@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           source_dir: .
           build_dir: build
@@ -242,12 +242,12 @@ jobs:
 
       - name: Parse Coverage Percentage
         id: coverage
-        uses: ai-warevo/.github/ci/actions/coverage-parser@main
+        uses: ai-warevo/.github/.github/actions/coverage-parser@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           xml_path: coverage.xml
 
       - name: Generate Coverage Badge
-        uses: ai-warevo/.github/ci/actions/badge@main
+        uses: ai-warevo/.github/.github/actions/badge@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           text_left: coverage
           text_right: '${{ steps.coverage.outputs.percent }}%'
@@ -257,7 +257,7 @@ jobs:
 
       - name: Deploy Coverage Badge
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        uses: ai-warevo/.github/ci/actions/badge-deploy@main
+        uses: ai-warevo/.github/.github/actions/badge-deploy@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           badge_path: coverage.svg
           branch: badges
@@ -265,7 +265,7 @@ jobs:
 
       - name: Deploy Coverage HTML to gh-pages
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        uses: ai-warevo/.github/ci/actions/coverage-html-deploy@main
+        uses: ai-warevo/.github/.github/actions/coverage-html-deploy@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
         with:
           folder: htmlcov
           branch: gh-pages
