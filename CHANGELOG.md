@@ -14,17 +14,27 @@ Maintainer notes (see AGENTS.md, "Changelog & releases"):
 
 ## [Unreleased]
 
+## [4.2.0] - 2026-11-21
+
 ### Added
 
-- exception reason metadata: `OperationCanceledException`, `TaskAlreadyMovedException` and `TimeoutException` gain a `reason` constructor and an `exception_reason()` accessor for structured diagnostics
-- lock-free `await_ready()`: `TaskStateBase::ready` is now `std::atomic<bool>`, so completion polling no longer acquires the state mutex (release/acquire preserves the exception/result happens-before)
+- add exception reason metadata to exception types
+- C++23
 
 ### Changed
 
-- cancellation callbacks are stored as `std::move_only_function<void()>`, avoiding `std::function`'s copy semantics and potential heap allocation on the cancellation hot path
-- move-only result extraction is guarded by the state mutex instead of a separate atomic flag, removing one synchronization primitive per task
-- cancellation callback execution uses `std::ranges` idioms and collects every callback failure instead of only the first (rethrow behavior is unchanged: the first exception wins)
-- `when_any` watcher allocation optimized: attach completion callbacks directly to each task instead of spawning N watcher coroutines (expected -20–30% setup time reduction for large N)
+- remove local release/changelog scripts, now handled by CI
+- remove redundant updater scripts
+- fix
+- replace redundant workflows with catalog reusable workflow wrappers
+- integrate reusable CI workflows and add Makefile contract targets
+- optimize when_any watcher allocation with direct callbacks
+- document Phase 1 and Phase 2 modernization changes
+- collect all cancellation callback failures
+- make task completion flag atomic for lock-free await_ready()
+- use std::ranges idioms for cleaner code
+- simplify move-only result tracking with lock-based flag
+- use std::move_only_function for cancellation callbacks
 
 ## [4.1.0] - 2026-11-18
 
@@ -153,7 +163,8 @@ Maintainer notes (see AGENTS.md, "Changelog & releases"):
 - `CancellationTokenSource`, `CancellationToken`, `cancel_after` and `OperationCanceledException`.
 - CMake package (`find_package(aw_tpl)` / `FetchContent`) and CI on Windows, Linux and macOS with GitHub Releases.
 
-[Unreleased]: https://github.com/ai-warevo/tpl/compare/v4.1.0...HEAD
+[Unreleased]: https://github.com/ai-warevo/tpl/compare/v4.2.0...HEAD
+[4.2.0]: https://github.com/ai-warevo/tpl/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/ai-warevo/tpl/compare/v4.0.1...v4.1.0
 [4.0.1]: https://github.com/ai-warevo/tpl/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/ai-warevo/tpl/compare/v3.1.1...v4.0.0
