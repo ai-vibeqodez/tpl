@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_DETAIL_DELAY_AWAITER_HPP
+#define AW_TPL_THREADING_DETAIL_DELAY_AWAITER_HPP
 
 #include <chrono>
 #include <coroutine>
@@ -18,3 +19,5 @@ struct DelayAwaiter {
 };
 
 } // namespace aw::tpl::threading::detail
+
+#endif  // AW_TPL_THREADING_DETAIL_DELAY_AWAITER_HPP

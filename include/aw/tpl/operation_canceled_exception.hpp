@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_OPERATION_CANCELED_EXCEPTION_HPP
+#define AW_TPL_OPERATION_CANCELED_EXCEPTION_HPP
 
 #include <exception>
 #include <string>
@@ -19,16 +20,16 @@ public:
      * @brief Creates the exception with a custom reason.
      * @param[in] reason Brief description of why the operation was canceled.
      */
-    explicit OperationCanceledException(const std::string& reason);
+    explicit OperationCanceledException(std::string reason);
 
     /// Returns the exception message.
-    const char* what() const noexcept override;
+    [[nodiscard]] const char* what() const noexcept override;
 
     /**
      * @brief Returns the reason the operation was canceled.
      * @return Reason string (empty if created with the default message).
      */
-    const std::string& exception_reason() const noexcept { return reason_; }
+    [[nodiscard]] const std::string& exception_reason() const noexcept { return reason_; }
 
 private:
     std::string message_;
@@ -36,3 +37,5 @@ private:
 };
 
 } // namespace aw::tpl
+
+#endif  // AW_TPL_OPERATION_CANCELED_EXCEPTION_HPP

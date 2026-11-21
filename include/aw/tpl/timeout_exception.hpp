@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_TIMEOUT_EXCEPTION_HPP
+#define AW_TPL_TIMEOUT_EXCEPTION_HPP
 
 #include <exception>
 #include <string>
@@ -20,23 +21,23 @@ public:
      * @brief Creates the exception with a custom message.
      * @param[in] message Text returned by @c what().
      */
-    explicit TimeoutException(const std::string& message);
+    explicit TimeoutException(std::string message);
 
     /**
      * @brief Creates the exception with a custom message and reason.
      * @param[in] message Text returned by @c what().
      * @param[in] reason Brief description of what operation timed out.
      */
-    TimeoutException(const std::string& message, const std::string& reason);
+    TimeoutException(std::string message, std::string reason);
 
     /// Returns the exception message.
-    const char* what() const noexcept override;
+    [[nodiscard]] const char* what() const noexcept override;
 
     /**
      * @brief Returns the reason the operation timed out.
      * @return Reason string (empty if not provided).
      */
-    const std::string& exception_reason() const noexcept { return reason_; }
+    [[nodiscard]] const std::string& exception_reason() const noexcept { return reason_; }
 
 private:
     std::string message_;
@@ -44,3 +45,5 @@ private:
 };
 
 } // namespace aw::tpl
+
+#endif  // AW_TPL_TIMEOUT_EXCEPTION_HPP

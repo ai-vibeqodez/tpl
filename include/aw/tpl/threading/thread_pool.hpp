@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_THREAD_POOL_HPP
+#define AW_TPL_THREADING_THREAD_POOL_HPP
 
 #include <aw/tpl/threading/detail/pool_scheduling.hpp>
 #include <aw/tpl/threading/detail/timer_entry.hpp>
@@ -106,3 +107,5 @@ private:
 };
 
 } // namespace aw::tpl::threading
+
+#endif  // AW_TPL_THREADING_THREAD_POOL_HPP

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_TASK_GROUP_HPP
+#define AW_TPL_THREADING_TASKS_TASK_GROUP_HPP
 
 /**
  * @file task_group.hpp
@@ -69,3 +70,5 @@ private:
 };
 
 } // namespace aw::tpl::threading::tasks
+
+#endif  // AW_TPL_THREADING_TASKS_TASK_GROUP_HPP

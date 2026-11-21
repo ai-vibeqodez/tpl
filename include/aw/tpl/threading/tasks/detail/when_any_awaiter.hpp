@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_DETAIL_WHEN_ANY_AWAITER_HPP
+#define AW_TPL_THREADING_TASKS_DETAIL_WHEN_ANY_AWAITER_HPP
 
 #include <aw/tpl/threading/tasks/detail/when_any_state.hpp>
 
@@ -21,3 +22,5 @@ struct WhenAnyAwaiter {
 };
 
 } // namespace aw::tpl::threading::tasks::detail
+
+#endif  // AW_TPL_THREADING_TASKS_DETAIL_WHEN_ANY_AWAITER_HPP

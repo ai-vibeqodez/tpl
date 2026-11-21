@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_DETAIL_POOL_SCHEDULING_HPP
+#define AW_TPL_THREADING_DETAIL_POOL_SCHEDULING_HPP
 
 #include <chrono>
 #include <coroutine>
@@ -52,3 +53,5 @@ void schedule_on_pool(ThreadPool* pool, std::coroutine_handle<> h);
 void schedule_after_on_pool(ThreadPool* pool, std::coroutine_handle<> h, std::chrono::milliseconds delay);
 
 } // namespace aw::tpl::threading::detail
+
+#endif  // AW_TPL_THREADING_DETAIL_POOL_SCHEDULING_HPP

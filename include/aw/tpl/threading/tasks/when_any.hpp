@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_WHEN_ANY_HPP
+#define AW_TPL_THREADING_TASKS_WHEN_ANY_HPP
 
 #include <aw/tpl/threading/tasks/task.hpp>
 #include <aw/tpl/threading/tasks/detail/when_any_awaiter.hpp>
@@ -65,7 +66,7 @@ Task<Task<T>> when_any(std::vector<Task<T>> tasks) {
 
         // Attach a callback that tries to complete the when_any state when this task finishes.
         std::size_t index = i;
-        auto when_any_state = state;
+        const auto& when_any_state = state;
         bool attached = task_state->try_attach_completion_callback([index, when_any_state]() {
             when_any_state->try_complete(index);
         });
@@ -114,3 +115,5 @@ auto when_any(const Task<Ts>&... tasks) {
 }
 
 } // namespace aw::tpl::threading::tasks
+
+#endif  // AW_TPL_THREADING_TASKS_WHEN_ANY_HPP

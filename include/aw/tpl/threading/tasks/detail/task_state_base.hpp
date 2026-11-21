@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_DETAIL_TASK_STATE_BASE_HPP
+#define AW_TPL_THREADING_TASKS_DETAIL_TASK_STATE_BASE_HPP
 
 #include <atomic>
 #include <coroutine>
@@ -53,7 +54,7 @@ struct TaskStateBase {
      * @brief Checks whether the task has completed in a thread-safe manner.
      * @return True if result or exception is ready.
      */
-    [[nodiscard]] bool is_ready();
+    [[nodiscard]] bool is_ready() const;
 
     /**
      * @brief Registers an awaiting coroutine if the task is not yet complete.
@@ -96,3 +97,5 @@ struct TaskStateBase {
 };
 
 } // namespace aw::tpl::threading::tasks::detail
+
+#endif  // AW_TPL_THREADING_TASKS_DETAIL_TASK_STATE_BASE_HPP

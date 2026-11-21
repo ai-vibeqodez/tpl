@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_DETAIL_TIMER_ENTRY_HPP
+#define AW_TPL_THREADING_DETAIL_TIMER_ENTRY_HPP
 
 #include <chrono>
 #include <coroutine>
@@ -17,3 +18,5 @@ struct TimerEntry {
 };
 
 } // namespace aw::tpl::threading::detail
+
+#endif  // AW_TPL_THREADING_DETAIL_TIMER_ENTRY_HPP

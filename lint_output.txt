@@ -1,0 +1,180 @@
+cmake -B build/debug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-- Configuring done (5.3s)
+-- Generating done (3.9s)
+-- Build files have been written to: /home/node/workspace/tpl/build/debug
+cmake --build build/debug
+gmake[1]: Entering directory '/home/node/workspace/tpl/build/debug'
+[  0%] Building CXX object CMakeFiles/aw_tpl.dir/src/operation_canceled_exception.cpp.o
+[  1%] Building CXX object CMakeFiles/aw_tpl.dir/src/timeout_exception.cpp.o
+[  2%] Building CXX object CMakeFiles/aw_tpl.dir/src/threading/cancellation_token.cpp.o
+[  3%] Building CXX object CMakeFiles/aw_tpl.dir/src/threading/thread_pool.cpp.o
+[  4%] Building CXX object CMakeFiles/aw_tpl.dir/src/threading/tasks/async_sleep.cpp.o
+[  4%] Building CXX object CMakeFiles/aw_tpl.dir/src/threading/tasks/task_already_moved_exception.cpp.o
+[  5%] Building CXX object CMakeFiles/aw_tpl.dir/src/threading/tasks/task_group.cpp.o
+[  6%] Building CXX object CMakeFiles/aw_tpl.dir/src/threading/tasks/task_void.cpp.o
+[  7%] Building CXX object CMakeFiles/aw_tpl.dir/src/threading/tasks/detail/completion_awaiter.cpp.o
+[  8%] Building CXX object CMakeFiles/aw_tpl.dir/src/threading/tasks/detail/final_awaiter.cpp.o
+[  9%] Building CXX object CMakeFiles/aw_tpl.dir/src/threading/tasks/detail/promise_void.cpp.o
+[ 10%] Building CXX object CMakeFiles/aw_tpl.dir/src/threading/tasks/detail/task_state_base.cpp.o
+[ 11%] Building CXX object CMakeFiles/aw_tpl.dir/src/threading/tasks/detail/when_any_watcher.cpp.o
+[ 11%] Linking CXX static library libaw_tpl.a
+[ 13%] Built target aw_tpl
+[ 14%] Building CXX object examples/CMakeFiles/aw_tpl_example_01_tasks_basics.dir/01_tasks_basics.cpp.o
+[ 15%] Linking CXX executable aw_tpl_example_01_tasks_basics
+[ 15%] Built target aw_tpl_example_01_tasks_basics
+[ 15%] Building CXX object examples/CMakeFiles/aw_tpl_example_02_task_run.dir/02_task_run.cpp.o
+[ 16%] Linking CXX executable aw_tpl_example_02_task_run
+[ 16%] Built target aw_tpl_example_02_task_run
+[ 17%] Building CXX object examples/CMakeFiles/aw_tpl_example_03_when_all.dir/03_when_all.cpp.o
+[ 17%] Linking CXX executable aw_tpl_example_03_when_all
+[ 17%] Built target aw_tpl_example_03_when_all
+[ 18%] Building CXX object examples/CMakeFiles/aw_tpl_example_04_when_any.dir/04_when_any.cpp.o
+[ 18%] Linking CXX executable aw_tpl_example_04_when_any
+[ 18%] Built target aw_tpl_example_04_when_any
+[ 19%] Building CXX object examples/CMakeFiles/aw_tpl_example_05_cancellation.dir/05_cancellation.cpp.o
+[ 20%] Linking CXX executable aw_tpl_example_05_cancellation
+[ 20%] Built target aw_tpl_example_05_cancellation
+[ 20%] Building CXX object examples/CMakeFiles/aw_tpl_example_06_thread_pool.dir/06_thread_pool.cpp.o
+[ 21%] Linking CXX executable aw_tpl_example_06_thread_pool
+[ 21%] Built target aw_tpl_example_06_thread_pool
+[ 22%] Building CXX object examples/CMakeFiles/aw_tpl_example_07_timeout.dir/07_timeout.cpp.o
+[ 22%] Linking CXX executable aw_tpl_example_07_timeout
+[ 22%] Built target aw_tpl_example_07_timeout
+[ 23%] Building CXX object examples/CMakeFiles/aw_tpl_example_08_co_spawn.dir/08_co_spawn.cpp.o
+[ 24%] Linking CXX executable aw_tpl_example_08_co_spawn
+[ 24%] Built target aw_tpl_example_08_co_spawn
+[ 92%] Built target Catch2
+[ 94%] Built target Catch2WithMain
+[ 95%] Building CXX object tests/CMakeFiles/tpl_tests.dir/test_cancellation.cpp.o
+[ 96%] Building CXX object tests/CMakeFiles/tpl_tests.dir/test_spawn.cpp.o
+[ 97%] Building CXX object tests/CMakeFiles/tpl_tests.dir/test_task.cpp.o
+[ 97%] Building CXX object tests/CMakeFiles/tpl_tests.dir/test_task_group.cpp.o
+[ 97%] Building CXX object tests/CMakeFiles/tpl_tests.dir/test_thread_pool.cpp.o
+[ 98%] Building CXX object tests/CMakeFiles/tpl_tests.dir/test_when_all.cpp.o
+[ 98%] Building CXX object tests/CMakeFiles/tpl_tests.dir/test_when_any.cpp.o
+[ 99%] Building CXX object tests/CMakeFiles/tpl_tests.dir/test_when_any_callbacks.cpp.o
+[100%] Linking CXX executable tpl_tests
+[100%] Built target tpl_tests
+gmake[1]: Leaving directory '/home/node/workspace/tpl/build/debug'
+[1/60] Processing file /home/node/workspace/tpl/include/aw/tpl/operation_canceled_exception.hpp.
+20231 warnings generated.
+[2/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/cancellation_token.hpp.
+59096 warnings generated.
+[3/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/cancellation_token_source.hpp.
+115235 warnings generated.
+[4/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/detail/callback_function.hpp.
+131079 warnings generated.
+[5/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/detail/cancellation_state.hpp.
+160064 warnings generated.
+[6/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/detail/delay_awaiter.hpp.
+207412 warnings generated.
+[7/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/detail/detached.hpp.
+212899 warnings generated.
+[8/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/detail/pool_scheduling.hpp.
+260247 warnings generated.
+[9/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/detail/timer_entry.hpp.
+307598 warnings generated.
+[10/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/async_sleep.hpp.
+363964 warnings generated.
+[11/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/cancelable_sleep_awaiter.hpp.
+420330 warnings generated.
+[12/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/completion_awaiter.hpp.
+460985 warnings generated.
+[13/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/final_awaiter.hpp.
+501640 warnings generated.
+[14/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/initial_schedule_awaiter.hpp.
+505850 warnings generated.
+[15/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/is_truly_copyable.hpp.
+526944 warnings generated.
+[16/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/promise.hpp.
+568050 warnings generated.
+[17/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/promise_base.hpp.
+609156 warnings generated.
+[18/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/promise_void.hpp.
+650293 warnings generated.
+[19/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/run_async.hpp.
+653423 warnings generated.
+[20/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/spawn_guard.hpp.
+697627 warnings generated.
+[21/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/task_group_awaiter.hpp.
+701837 warnings generated.
+[22/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/task_state.hpp.
+732717 warnings generated.
+[23/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/task_stateless_exception.hpp.
+752951 warnings generated.
+[24/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/task_state_base.hpp.
+783456 warnings generated.
+[25/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/when_all_element.hpp.
+790682 warnings generated.
+[26/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/when_all_settled.hpp.
+811776 warnings generated.
+[27/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/when_any_awaiter.hpp.
+847939 warnings generated.
+[28/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/when_any_state.hpp.
+867472 warnings generated.
+[29/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/detail/when_any_watcher.hpp.
+908127 warnings generated.
+[30/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/spawn.hpp.
+952332 warnings generated.
+[31/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/task.hpp.
+996080 warnings generated.
+[32/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/task_already_moved_exception.hpp.
+1016311 warnings generated.
+[33/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/task_fwd.hpp.
+1016311 warnings generated.
+[34/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/task_group.hpp.
+1054045 warnings generated.
+[35/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/task_void.hpp.
+1095186 warnings generated.
+[36/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/when_all.hpp.
+1139016 warnings generated.
+[37/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/tasks/when_any.hpp.
+1182865 warnings generated.
+[38/60] Processing file /home/node/workspace/tpl/include/aw/tpl/threading/thread_pool.hpp.
+1247057 warnings generated.
+[39/60] Processing file /home/node/workspace/tpl/include/aw/tpl/timeout_exception.hpp.
+1267288 warnings generated.
+[40/60] Processing file /home/node/workspace/tpl/include/aw/tpl/tpl.hpp.
+1333696 warnings generated.
+[41/60] Processing file /home/node/workspace/tpl/src/operation_canceled_exception.cpp.
+1353931 warnings generated.
+[42/60] Processing file /home/node/workspace/tpl/src/threading/cancellation_token.cpp.
+1396374 warnings generated.
+[43/60] Processing file /home/node/workspace/tpl/src/threading/cancellation_token_source.cpp.
+1454459 warnings generated.
+[44/60] Processing file /home/node/workspace/tpl/src/threading/detail/cancellation_state.cpp.
+1498038 warnings generated.
+[45/60] Processing file /home/node/workspace/tpl/src/threading/detail/delay_awaiter.cpp.
+1545386 warnings generated.
+[46/60] Processing file /home/node/workspace/tpl/src/threading/tasks/async_sleep.cpp.
+1602008 warnings generated.
+[47/60] Processing file /home/node/workspace/tpl/src/threading/tasks/detail/cancelable_sleep_awaiter.cpp.
+1659645 warnings generated.
+[48/60] Processing file /home/node/workspace/tpl/src/threading/tasks/detail/completion_awaiter.cpp.
+1700300 warnings generated.
+[49/60] Processing file /home/node/workspace/tpl/src/threading/tasks/detail/final_awaiter.cpp.
+1741034 warnings generated.
+[50/60] Processing file /home/node/workspace/tpl/src/threading/tasks/detail/initial_schedule_awaiter.cpp.
+1788462 warnings generated.
+[51/60] Processing file /home/node/workspace/tpl/src/threading/tasks/detail/promise_void.cpp.
+1829603 warnings generated.
+[52/60] Processing file /home/node/workspace/tpl/src/threading/tasks/detail/task_state_base.cpp.
+1889663 warnings generated.
+[53/60] Processing file /home/node/workspace/tpl/src/threading/tasks/detail/when_any_awaiter.cpp.
+1925826 warnings generated.
+[54/60] Processing file /home/node/workspace/tpl/src/threading/tasks/detail/when_any_state.cpp.
+1978545 warnings generated.
+[55/60] Processing file /home/node/workspace/tpl/src/threading/tasks/detail/when_any_watcher.cpp.
+2019315 warnings generated.
+[56/60] Processing file /home/node/workspace/tpl/src/threading/tasks/task_already_moved_exception.cpp.
+2039549 warnings generated.
+[57/60] Processing file /home/node/workspace/tpl/src/threading/tasks/task_group.cpp.
+2100548 warnings generated.
+[58/60] Processing file /home/node/workspace/tpl/src/threading/tasks/task_void.cpp.
+2141692 warnings generated.
+[59/60] Processing file /home/node/workspace/tpl/src/threading/thread_pool.cpp.
+2209028 warnings generated.
+[60/60] Processing file /home/node/workspace/tpl/src/timeout_exception.cpp.
+2229263 warnings generated.
+Suppressed 2229272 warnings (2229263 in non-user code, 9 NOLINT).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

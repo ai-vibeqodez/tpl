@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_TASK_FWD_HPP
+#define AW_TPL_THREADING_TASKS_TASK_FWD_HPP
 
 namespace aw::tpl::threading::tasks {
 
@@ -10,3 +11,5 @@ template <typename T = void>
 class Task;
 
 } // namespace aw::tpl::threading::tasks
+
+#endif  // AW_TPL_THREADING_TASKS_TASK_FWD_HPP

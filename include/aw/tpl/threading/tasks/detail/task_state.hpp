@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_DETAIL_TASK_STATE_HPP
+#define AW_TPL_THREADING_TASKS_DETAIL_TASK_STATE_HPP
 
 #include <aw/tpl/threading/tasks/detail/task_state_base.hpp>
 
@@ -45,3 +46,5 @@ struct TaskState : TaskState<void> {
 };
 
 } // namespace aw::tpl::threading::tasks::detail
+
+#endif  // AW_TPL_THREADING_TASKS_DETAIL_TASK_STATE_HPP

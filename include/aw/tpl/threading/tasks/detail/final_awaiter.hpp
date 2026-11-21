@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_DETAIL_FINAL_AWAITER_HPP
+#define AW_TPL_THREADING_TASKS_DETAIL_FINAL_AWAITER_HPP
 
 #include <aw/tpl/threading/tasks/detail/task_state_base.hpp>
 
@@ -27,3 +28,5 @@ struct FinalAwaiter {
 };
 
 } // namespace aw::tpl::threading::tasks::detail
+
+#endif  // AW_TPL_THREADING_TASKS_DETAIL_FINAL_AWAITER_HPP

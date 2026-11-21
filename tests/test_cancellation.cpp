@@ -196,9 +196,9 @@ TEST_CASE("Moved-from CancellationTokenSource is inert", "[cancellation][move]")
     auto token_a = a.token();
     CancellationTokenSource b(std::move(a));
 
-    REQUIRE_NOTHROW(a.cancel());                          // NOLINT(bugprone-use-after-move)
-    REQUIRE_NOTHROW(a.cancel_after(1ms));                 // NOLINT(bugprone-use-after-move)
-    REQUIRE_FALSE(a.token().is_cancellation_requested()); // NOLINT(bugprone-use-after-move)
+    REQUIRE_NOTHROW(a.cancel());
+    REQUIRE_NOTHROW(a.cancel_after(1ms));
+    REQUIRE_FALSE(a.token().is_cancellation_requested());
     REQUIRE_FALSE(token_a.is_cancellation_requested());
 
     b.cancel();

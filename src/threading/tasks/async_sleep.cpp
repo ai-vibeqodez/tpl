@@ -9,7 +9,7 @@ threading::detail::DelayAwaiter async_sleep(std::chrono::milliseconds duration) 
 }
 
 detail::CancelableSleepAwaiter async_sleep(std::chrono::milliseconds duration, CancellationToken token) {
-    return detail::CancelableSleepAwaiter{duration, std::move(token)};
+    return detail::CancelableSleepAwaiter{.duration = duration, .token = std::move(token)};
 }
 
 } // namespace aw::tpl::threading::tasks

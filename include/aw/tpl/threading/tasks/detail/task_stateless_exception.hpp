@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_DETAIL_TASK_STATELESS_EXCEPTION_HPP
+#define AW_TPL_THREADING_TASKS_DETAIL_TASK_STATELESS_EXCEPTION_HPP
 
 #include <exception>
 #include <string>
@@ -13,7 +14,7 @@ public:
     task_stateless_exception()
         : message_("Task has no shared state (default-constructed or moved-from).") {}
 
-    const char* what() const noexcept override {
+    [[nodiscard]] const char* what() const noexcept override {
         return message_.c_str();
     }
 
@@ -22,3 +23,5 @@ private:
 };
 
 } // namespace aw::tpl::threading::tasks::detail
+
+#endif  // AW_TPL_THREADING_TASKS_DETAIL_TASK_STATELESS_EXCEPTION_HPP

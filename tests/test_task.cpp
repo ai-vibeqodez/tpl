@@ -222,7 +222,7 @@ TEST_CASE("Empty and moved-from tasks throw logic_error instead of crashing", "[
     auto ready = []() -> Task<int> { co_return 1; }();
     REQUIRE(ready.result() == 1);
     Task<int> other = std::move(ready);
-    REQUIRE_THROWS_AS(ready.result(), std::exception); // NOLINT(bugprone-use-after-move)
+    REQUIRE_THROWS_AS(ready.result(), std::exception);
     REQUIRE(other.result() == 1);
 
     auto awaiter = [](Task<int> t) -> Task<bool> {

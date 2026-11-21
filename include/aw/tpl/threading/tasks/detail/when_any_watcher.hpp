@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_DETAIL_WHEN_ANY_WATCHER_HPP
+#define AW_TPL_THREADING_TASKS_DETAIL_WHEN_ANY_WATCHER_HPP
 
 #include <aw/tpl/threading/tasks/detail/completion_awaiter.hpp>
 #include <aw/tpl/threading/tasks/detail/when_any_state.hpp>
@@ -16,3 +17,5 @@ namespace aw::tpl::threading::tasks::detail {
 void spawn_when_any_watcher(CompletionAwaiter completion, std::size_t index, std::shared_ptr<WhenAnyState> state);
 
 } // namespace aw::tpl::threading::tasks::detail
+
+#endif  // AW_TPL_THREADING_TASKS_DETAIL_WHEN_ANY_WATCHER_HPP

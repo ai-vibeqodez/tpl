@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_CANCELLATION_TOKEN_SOURCE_HPP
+#define AW_TPL_THREADING_CANCELLATION_TOKEN_SOURCE_HPP
 
 #include <aw/tpl/threading/cancellation_token.hpp>
 
@@ -47,3 +48,5 @@ private:
 };
 
 } // namespace aw::tpl::threading
+
+#endif  // AW_TPL_THREADING_CANCELLATION_TOKEN_SOURCE_HPP

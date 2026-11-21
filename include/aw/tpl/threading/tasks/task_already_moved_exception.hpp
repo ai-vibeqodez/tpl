@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_TASK_ALREADY_MOVED_EXCEPTION_HPP
+#define AW_TPL_THREADING_TASKS_TASK_ALREADY_MOVED_EXCEPTION_HPP
 
 #include <exception>
 #include <string>
@@ -15,13 +16,13 @@ public:
     TaskAlreadyMovedException();
 
     /// Returns the exception message.
-    const char* what() const noexcept override;
+    [[nodiscard]] const char* what() const noexcept override;
 
     /**
      * @brief Returns the reason the move already occurred.
      * @return Reason string describing the context.
      */
-    const std::string& exception_reason() const noexcept { return reason_; }
+    [[nodiscard]] const std::string& exception_reason() const noexcept { return reason_; }
 
 private:
     std::string message_;
@@ -29,3 +30,5 @@ private:
 };
 
 } // namespace aw::tpl::threading::tasks
+
+#endif  // AW_TPL_THREADING_TASKS_TASK_ALREADY_MOVED_EXCEPTION_HPP

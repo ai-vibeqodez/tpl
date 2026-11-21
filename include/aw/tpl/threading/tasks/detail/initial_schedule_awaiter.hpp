@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_DETAIL_INITIAL_SCHEDULE_AWAITER_HPP
+#define AW_TPL_THREADING_TASKS_DETAIL_INITIAL_SCHEDULE_AWAITER_HPP
 
 #include <coroutine>
 
@@ -15,3 +16,5 @@ struct InitialScheduleAwaiter {
 };
 
 } // namespace aw::tpl::threading::tasks::detail
+
+#endif  // AW_TPL_THREADING_TASKS_DETAIL_INITIAL_SCHEDULE_AWAITER_HPP

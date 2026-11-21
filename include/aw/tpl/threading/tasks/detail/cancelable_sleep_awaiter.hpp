@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_DETAIL_CANCELABLE_SLEEP_AWAITER_HPP
+#define AW_TPL_THREADING_TASKS_DETAIL_CANCELABLE_SLEEP_AWAITER_HPP
 
 #include <aw/tpl/threading/cancellation_token.hpp>
 
@@ -22,3 +23,5 @@ struct CancelableSleepAwaiter {
 };
 
 } // namespace aw::tpl::threading::tasks::detail
+
+#endif  // AW_TPL_THREADING_TASKS_DETAIL_CANCELABLE_SLEEP_AWAITER_HPP

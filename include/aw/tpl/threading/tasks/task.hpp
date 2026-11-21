@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_TASK_HPP
+#define AW_TPL_THREADING_TASKS_TASK_HPP
 
 /**
  * @file task.hpp
@@ -163,3 +164,5 @@ Task<T> Promise<T>::get_return_object() noexcept {
 } // namespace detail
 
 } // namespace aw::tpl::threading::tasks
+
+#endif  // AW_TPL_THREADING_TASKS_TASK_HPP

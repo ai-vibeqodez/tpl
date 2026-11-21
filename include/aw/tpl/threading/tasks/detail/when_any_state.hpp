@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_DETAIL_WHEN_ANY_STATE_HPP
+#define AW_TPL_THREADING_TASKS_DETAIL_WHEN_ANY_STATE_HPP
 
 #include <atomic>
 #include <coroutine>
@@ -26,3 +27,5 @@ struct WhenAnyState {
 };
 
 } // namespace aw::tpl::threading::tasks::detail
+
+#endif  // AW_TPL_THREADING_TASKS_DETAIL_WHEN_ANY_STATE_HPP

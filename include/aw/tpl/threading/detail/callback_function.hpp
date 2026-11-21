@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_DETAIL_CALLBACK_FUNCTION_HPP
+#define AW_TPL_THREADING_DETAIL_CALLBACK_FUNCTION_HPP
 
 #if __has_include(<version>)
 #include <version>
@@ -17,3 +18,5 @@ using CallbackFunction = std::function<Signature>;
 #endif
 
 } // namespace aw::tpl::threading::detail
+
+#endif  // AW_TPL_THREADING_DETAIL_CALLBACK_FUNCTION_HPP

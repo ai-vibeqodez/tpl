@@ -18,7 +18,7 @@ TaskStateBase::~TaskStateBase() {
     }
 }
 
-bool TaskStateBase::is_ready() {
+bool TaskStateBase::is_ready() const {
     return ready.load(std::memory_order_acquire);
 }
 

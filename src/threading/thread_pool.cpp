@@ -39,8 +39,8 @@ CurrentPoolScope::~CurrentPoolScope() noexcept {
 }
 
 void schedule_on_pool(ThreadPool* pool, std::coroutine_handle<> h) {
-    if (!pool) {
-        pool = current_pool() ? current_pool() : &ThreadPool::global();
+    if (pool == nullptr) {
+        pool = current_pool() != nullptr ? current_pool() : &ThreadPool::global();
     }
     pool->schedule(h);
 }
@@ -50,8 +50,8 @@ void schedule_on_pool(std::coroutine_handle<> h) {
 }
 
 void schedule_after_on_pool(ThreadPool* pool, std::coroutine_handle<> h, std::chrono::milliseconds delay) {
-    if (!pool) {
-        pool = current_pool() ? current_pool() : &ThreadPool::global();
+    if (pool == nullptr) {
+        pool = current_pool() != nullptr ? current_pool() : &ThreadPool::global();
     }
     pool->schedule_after(h, delay);
 }

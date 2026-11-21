@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_DETAIL_RUN_ASYNC_HPP
+#define AW_TPL_THREADING_TASKS_DETAIL_RUN_ASYNC_HPP
 
 #include <aw/tpl/threading/tasks/task_fwd.hpp>
 
@@ -25,3 +26,5 @@ auto run_async(Func fn) -> Task<std::invoke_result_t<Func>> {
 }
 
 } // namespace aw::tpl::threading::tasks::detail
+
+#endif  // AW_TPL_THREADING_TASKS_DETAIL_RUN_ASYNC_HPP

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_CANCELLATION_TOKEN_HPP
+#define AW_TPL_THREADING_CANCELLATION_TOKEN_HPP
 
 #include <cstddef>
 #include <cstdint>
@@ -71,3 +72,5 @@ private:
 };
 
 } // namespace aw::tpl::threading
+
+#endif  // AW_TPL_THREADING_CANCELLATION_TOKEN_HPP

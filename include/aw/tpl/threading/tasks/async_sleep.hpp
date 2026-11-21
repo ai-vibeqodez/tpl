@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_ASYNC_SLEEP_HPP
+#define AW_TPL_THREADING_TASKS_ASYNC_SLEEP_HPP
 
 #include <aw/tpl/threading/cancellation_token.hpp>
 #include <aw/tpl/threading/detail/delay_awaiter.hpp>
@@ -25,3 +26,5 @@ namespace aw::tpl::threading::tasks {
 [[nodiscard]] detail::CancelableSleepAwaiter async_sleep(std::chrono::milliseconds duration, CancellationToken token);
 
 } // namespace aw::tpl::threading::tasks
+
+#endif  // AW_TPL_THREADING_TASKS_ASYNC_SLEEP_HPP

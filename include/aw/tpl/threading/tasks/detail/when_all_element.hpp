@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_DETAIL_WHEN_ALL_ELEMENT_HPP
+#define AW_TPL_THREADING_TASKS_DETAIL_WHEN_ALL_ELEMENT_HPP
 
 #include <variant>
 
@@ -19,3 +20,5 @@ template <typename T>
 using WhenAllElementT = typename WhenAllElement<T>::type;
 
 } // namespace aw::tpl::threading::tasks::detail
+
+#endif  // AW_TPL_THREADING_TASKS_DETAIL_WHEN_ALL_ELEMENT_HPP

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_DETAIL_IS_TRULY_COPYABLE_HPP
+#define AW_TPL_THREADING_TASKS_DETAIL_IS_TRULY_COPYABLE_HPP
 
 #include <array>
 #include <cstddef>
@@ -42,3 +43,5 @@ template <typename T>
 inline constexpr bool is_truly_copyable_v = is_truly_copyable<T>::value;
 
 } // namespace aw::tpl::threading::tasks::detail
+
+#endif  // AW_TPL_THREADING_TASKS_DETAIL_IS_TRULY_COPYABLE_HPP

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_TASK_VOID_HPP
+#define AW_TPL_THREADING_TASKS_TASK_VOID_HPP
 
 /**
  * @file task_void.hpp
@@ -54,7 +55,7 @@ public:
      */
     template <typename U>
         requires(!std::is_void_v<U>)
-    Task(const Task<U>& other) noexcept // NOLINT(google-explicit-constructor): implicit like C# upcast
+    Task(const Task<U>& other) noexcept
         : state_(other.state_) {}
 
     /**
@@ -126,3 +127,5 @@ private:
 };
 
 } // namespace aw::tpl::threading::tasks
+
+#endif  // AW_TPL_THREADING_TASKS_TASK_VOID_HPP

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_WHEN_ALL_HPP
+#define AW_TPL_THREADING_TASKS_WHEN_ALL_HPP
 
 #include <aw/tpl/threading/tasks/task.hpp>
 #include <aw/tpl/threading/tasks/detail/when_all_element.hpp>
@@ -102,3 +103,5 @@ auto when_all(Task<Ts>... tasks) {
 }
 
 } // namespace aw::tpl::threading::tasks
+
+#endif  // AW_TPL_THREADING_TASKS_WHEN_ALL_HPP

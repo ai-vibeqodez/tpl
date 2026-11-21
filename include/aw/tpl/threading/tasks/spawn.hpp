@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_SPAWN_HPP
+#define AW_TPL_THREADING_TASKS_SPAWN_HPP
 
 /**
  * @file spawn.hpp
@@ -60,3 +61,5 @@ void co_spawn(TaskGroup& group, Task<T> task, ErrorHandler on_error = {}) {
 }
 
 } // namespace aw::tpl::threading::tasks
+
+#endif  // AW_TPL_THREADING_TASKS_SPAWN_HPP

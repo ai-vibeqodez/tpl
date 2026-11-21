@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_DETAIL_SPAWN_GUARD_HPP
+#define AW_TPL_THREADING_TASKS_DETAIL_SPAWN_GUARD_HPP
 
 #include <aw/tpl/threading/tasks/task.hpp>
 #include <aw/tpl/threading/tasks/task_group.hpp>
@@ -36,3 +37,5 @@ Task<void> spawn_guard(Task<T> task, std::function<void(std::exception_ptr)> han
 }
 
 } // namespace aw::tpl::threading::tasks::detail
+
+#endif  // AW_TPL_THREADING_TASKS_DETAIL_SPAWN_GUARD_HPP

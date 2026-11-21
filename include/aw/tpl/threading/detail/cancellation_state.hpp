@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_DETAIL_CANCELLATION_STATE_HPP
+#define AW_TPL_THREADING_DETAIL_CANCELLATION_STATE_HPP
 
 #include <atomic>
 #include <cstddef>
@@ -47,3 +48,5 @@ struct CancellationState {
 };
 
 } // namespace aw::tpl::threading::detail
+
+#endif  // AW_TPL_THREADING_DETAIL_CANCELLATION_STATE_HPP

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_DETAIL_DETACHED_HPP
+#define AW_TPL_THREADING_DETAIL_DETACHED_HPP
 
 #include <coroutine>
 #include <exception>
@@ -34,3 +35,5 @@ struct Detached {
 };
 
 } // namespace aw::tpl::threading::detail
+
+#endif  // AW_TPL_THREADING_DETAIL_DETACHED_HPP

@@ -3,10 +3,10 @@
 namespace aw::tpl {
 
 OperationCanceledException::OperationCanceledException()
-    : message_("Operation was canceled."), reason_("") {}
+    : message_("Operation was canceled.") {}
 
-OperationCanceledException::OperationCanceledException(const std::string& reason)
-    : message_("Operation was canceled."), reason_(reason) {}
+OperationCanceledException::OperationCanceledException(std::string reason)
+    : message_("Operation was canceled."), reason_(std::move(reason)) {}
 
 const char* OperationCanceledException::what() const noexcept {
     return message_.c_str();

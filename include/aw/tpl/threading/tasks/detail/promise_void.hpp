@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_DETAIL_PROMISE_VOID_HPP
+#define AW_TPL_THREADING_TASKS_DETAIL_PROMISE_VOID_HPP
 
 #include <aw/tpl/threading/tasks/task_fwd.hpp>
 #include <aw/tpl/threading/tasks/detail/promise.hpp>
@@ -18,3 +19,5 @@ struct Promise<void> : PromiseBase<void> {
 };
 
 } // namespace aw::tpl::threading::tasks::detail
+
+#endif  // AW_TPL_THREADING_TASKS_DETAIL_PROMISE_VOID_HPP

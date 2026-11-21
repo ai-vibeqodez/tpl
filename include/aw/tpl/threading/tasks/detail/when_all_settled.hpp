@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_DETAIL_WHEN_ALL_SETTLED_HPP
+#define AW_TPL_THREADING_TASKS_DETAIL_WHEN_ALL_SETTLED_HPP
 
 #include <aw/tpl/threading/tasks/detail/is_truly_copyable.hpp>
 #include <aw/tpl/threading/tasks/detail/when_all_element.hpp>
@@ -23,3 +24,5 @@ template <typename T>
 struct is_truly_copyable<WhenAllSettled<T>> : std::bool_constant<is_truly_copyable<WhenAllElementT<T>>::value> {};
 
 } // namespace aw::tpl::threading::tasks::detail
+
+#endif  // AW_TPL_THREADING_TASKS_DETAIL_WHEN_ALL_SETTLED_HPP

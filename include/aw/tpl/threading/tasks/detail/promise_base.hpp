@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_THREADING_TASKS_DETAIL_PROMISE_BASE_HPP
+#define AW_TPL_THREADING_TASKS_DETAIL_PROMISE_BASE_HPP
 
 #include <aw/tpl/threading/tasks/detail/final_awaiter.hpp>
 #include <aw/tpl/threading/tasks/detail/initial_schedule_awaiter.hpp>
@@ -34,3 +35,5 @@ struct PromiseBase {
 };
 
 } // namespace aw::tpl::threading::tasks::detail
+
+#endif  // AW_TPL_THREADING_TASKS_DETAIL_PROMISE_BASE_HPP

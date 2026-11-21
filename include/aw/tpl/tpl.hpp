@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AW_TPL_TPL_HPP
+#define AW_TPL_TPL_HPP
 
 /**
  * @file tpl.hpp
@@ -25,3 +26,5 @@
 #include <aw/tpl/threading/tasks/task_group.hpp>
 #include <aw/tpl/threading/tasks/when_all.hpp>
 #include <aw/tpl/threading/tasks/when_any.hpp>
+
+#endif  // AW_TPL_TPL_HPP
