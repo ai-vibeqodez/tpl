@@ -124,6 +124,13 @@ Checks:
   - '-hicpp-member-init'
   # Nodiscard: Catch2 functions lack [[nodiscard]]
   - '-modernize-use-nodiscard'
+  # --- tpl-specific exclusions (also applicable to tobus coroutines) ---
+  # Const/ref data members: awaiter lifetime semantics require reference storage (task_group_awaiter)
+  - '-cppcoreguidelines-avoid-const-or-ref-data-members'
+  # Unnecessary value param: move semantics pattern in co_spawn (TaskGroup copied for RAII release)
+  - '-performance-unnecessary-value-param'
+  # Use after move: Catch2 REQUIRE_NOTHROW after move testing intentional
+  - '-bugprone-use-after-move'
 
 WarningsAsErrors: '*'
 HeaderFilterRegex: '^(include|src)/'
