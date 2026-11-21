@@ -1,4 +1,4 @@
-# PR Test — fast unit tests on every pull request
+# PR Test - fast unit tests on every pull request
 #
 # Triggers: pull_request and push to main/master
 # Calls: reusable-matrix.yml from ai-warevo/.github
