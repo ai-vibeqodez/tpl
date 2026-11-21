@@ -5,10 +5,7 @@ include(FetchContent)
 
 FetchContent_Declare(
     aw_cmake_modules
-    GIT_REPOSITORY https://github.com/ai-warevo/template_cpp.git
-    GIT_TAG        main
-    GIT_SHALLOW    TRUE
-    SOURCE_SUBDIR  non_existent_dir
+    SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../template-cpp
 )
 
 FetchContent_MakeAvailable(aw_cmake_modules)
@@ -16,32 +13,35 @@ FetchContent_MakeAvailable(aw_cmake_modules)
 # Add remote cmake directory to module search path
 list(APPEND CMAKE_MODULE_PATH "${aw_cmake_modules_SOURCE_DIR}/cmake")
 
-# --- Project configuration (remote base + local extensions) ---
-include(ProjectConfig)  # From remote
-include(cmake/ProjectConfigExt.cmake)  # Local extension for C++23 runtime checks
+# --- Project configuration (all from remote) ---
+include(ProjectConfig)
 
 aw_project_config(NAME tpl NS aw::)
 
 project(${AW_PROJECT_NAME} VERSION ${AW_PROJECT_VERSION} LANGUAGES CXX)
 
-# --- Find dependencies ---
+# --- Find dependencies (before using them) ---
 find_package(Threads REQUIRED)
 
-# Check C++23 runtime support after project()
+# --- Additional cmake modules (must come after project() and after Threads is found) ---
+include(CXX23Runtime)
+include(Compiler)
+
+# Check C++23 runtime support
 aw_check_cxx23_runtime()
 
 # --- Top-level detection and basic setup ---
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    set(PROJECT_IS_TOP_LEVEL ON)
+    set(TPL_IS_TOP_LEVEL ON)
 else()
-    set(PROJECT_IS_TOP_LEVEL OFF)
+    set(TPL_IS_TOP_LEVEL OFF)
 endif()
 
 # --- Options ---
-option(AW_TPL_BUILD_EXAMPLES "Build aw::tpl example applications" ${PROJECT_IS_TOP_LEVEL})
-option(AW_TPL_BUILD_TESTS "Build aw::tpl unit tests" ${PROJECT_IS_TOP_LEVEL})
-option(AW_TPL_INSTALL "Generate install rules and package config for aw::tpl" ${PROJECT_IS_TOP_LEVEL})
-option(AW_WARNINGS_AS_ERRORS "Build with strict warnings treated as errors" OFF)
+option(AW_TPL_BUILD_EXAMPLES "Build aw::tpl example applications" ${TPL_IS_TOP_LEVEL})
+option(AW_TPL_BUILD_TESTS "Build aw::tpl unit tests" ${TPL_IS_TOP_LEVEL})
+option(AW_TPL_INSTALL "Generate install rules and package config for aw::tpl" ${TPL_IS_TOP_LEVEL})
+option(AW_TPL_WARNINGS_AS_ERRORS "Build with strict warnings treated as errors" OFF)
 option(AW_ENABLE_COVERAGE "Enable code coverage instrumentation" OFF)
 set(AW_SANITIZE "none" CACHE STRING "Sanitizer to enable: none, address (ASan+UBSan) or thread (TSan)")
 set_property(CACHE AW_SANITIZE PROPERTY STRINGS none address thread)
@@ -57,8 +57,7 @@ if(NOT AW_SANITIZE STREQUAL "none")
 endif()
 
 # --- Core library ---
-include(CoreLibrary)  # From remote
-include(cmake/Compiler.cmake)  # Local (project-specific compiler flags)
+include(CoreLibrary)
 
 set(AW_TPL_SOURCES
     src/operation_canceled_exception.cpp
@@ -146,11 +145,15 @@ target_sources(aw_tpl
 )
 
 # Apply compiler-specific configuration
-aw_configure_compiler(TARGET aw_tpl STRICT_WARNINGS)
+if(AW_TPL_WARNINGS_AS_ERRORS)
+    aw_configure_compiler(TARGET aw_tpl STRICT_WARNINGS)
+else()
+    aw_configure_compiler(TARGET aw_tpl)
+endif()
 
 # --- Install & Package Export ---
 if(AW_TPL_INSTALL)
-    include(cmake/Library/InstallExport.cmake)  # Local copy
+    include(Library/InstallExport)
     aw_install_library(TARGET aw_tpl NAME tpl NS aw::tpl DEPENDENCIES Threads)
 endif()
 
