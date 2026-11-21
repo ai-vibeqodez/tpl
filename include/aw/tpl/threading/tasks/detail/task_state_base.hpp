@@ -8,6 +8,11 @@
 #include <semaphore>
 #include <vector>
 
+// std::move_only_function is C++26; libc++ in clang-18 does not provide it.
+#if __has_include(<version>) && defined(__cpp_lib_move_only_function) && __cpp_lib_move_only_function >= 202110L
+#define AW_TPL_HAS_MOVE_ONLY_FUNCTION 1
+#endif
+
 namespace aw::tpl::threading::tasks::detail {
 
 /**
@@ -30,7 +35,11 @@ struct TaskStateBase {
     std::atomic<bool> ready{false};
     std::vector<std::coroutine_handle<>> continuations;
     /// Fire-and-forget callbacks invoked once on completion; used by when_any optimization.
+#ifdef AW_TPL_HAS_MOVE_ONLY_FUNCTION
     std::vector<std::move_only_function<void()>> completion_callbacks;
+#else
+    std::vector<std::function<void()>> completion_callbacks;
+#endif
     std::exception_ptr exception = nullptr;
     std::binary_semaphore done_sem{0};
 
@@ -68,7 +77,13 @@ struct TaskStateBase {
      * @param[in] callback Invoked with no arguments; must not block or throw.
      * @return True if registered (callback will fire later); false if already ready (caller must handle).
      */
-    bool try_attach_completion_callback(std::move_only_function<void()> callback);
+    bool try_attach_completion_callback(
+#ifdef AW_TPL_HAS_MOVE_ONLY_FUNCTION
+        std::move_only_function<void()> callback
+#else
+        std::function<void()> callback
+#endif
+    );
 
     /**
      * @brief @c await_suspend helper: attaches @p awaiting or hands it straight back when already ready.

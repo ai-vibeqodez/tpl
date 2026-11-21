@@ -3,6 +3,7 @@
 
 #include <aw/tpl/threading/detail/pool_scheduling.hpp>
 
+#include <algorithm>
 #include <ranges>
 
 namespace aw::tpl::threading::tasks::detail {
@@ -30,7 +31,13 @@ bool TaskStateBase::try_attach_continuation(std::coroutine_handle<> awaiting) {
     return true;
 }
 
-bool TaskStateBase::try_attach_completion_callback(std::move_only_function<void()> callback) {
+bool TaskStateBase::try_attach_completion_callback(
+#ifdef AW_TPL_HAS_MOVE_ONLY_FUNCTION
+    std::move_only_function<void()> callback
+#else
+    std::function<void()> callback
+#endif
+) {
     std::lock_guard lock(mtx);
     if (ready.load(std::memory_order_relaxed)) {
         return false;
@@ -48,7 +55,11 @@ std::coroutine_handle<> TaskStateBase::suspend_or_resume(std::coroutine_handle<>
 
 std::coroutine_handle<> TaskStateBase::finish() {
     std::vector<std::coroutine_handle<>> to_resume;
+#ifdef AW_TPL_HAS_MOVE_ONLY_FUNCTION
     std::vector<std::move_only_function<void()>> callbacks_to_run;
+#else
+    std::vector<std::function<void()>> callbacks_to_run;
+#endif
     {
         std::lock_guard lock(mtx);
         ready.store(true, std::memory_order_release);
@@ -70,7 +81,7 @@ std::coroutine_handle<> TaskStateBase::finish() {
 
     // The first continuation is resumed by symmetric transfer, the rest are scheduled on the pool.
     std::coroutine_handle<> first = to_resume.front();
-    std::for_each(to_resume.begin() + 1, to_resume.end(),
+    std::ranges::for_each(to_resume.begin() + 1, to_resume.end(),
                   [](auto h) { threading::detail::schedule_on_pool(h); });
     return first;
 }

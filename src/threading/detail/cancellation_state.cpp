@@ -2,12 +2,17 @@
 
 #include <algorithm>
 #include <exception>
+#include <functional>
 #include <ranges>
 
 namespace aw::tpl::threading::detail {
 
 void CancellationState::cancel() {
+#ifdef AW_TPL_HAS_MOVE_ONLY_FUNCTION
     std::vector<std::pair<std::uint64_t, std::move_only_function<void()>>> to_run;
+#else
+    std::vector<std::pair<std::uint64_t, std::function<void()>>> to_run;
+#endif
     {
         std::lock_guard lock(mtx);
         if (canceled.exchange(true, std::memory_order_acq_rel)) {
@@ -32,9 +37,19 @@ void CancellationState::cancel() {
     }
 }
 
-std::uint64_t CancellationState::register_callback(std::move_only_function<void()> cb) {
+std::uint64_t CancellationState::register_callback(
+#ifdef AW_TPL_HAS_MOVE_ONLY_FUNCTION
+    std::move_only_function<void()> cb
+#else
+    std::function<void()> cb
+#endif
+) {
     std::uint64_t id = 0;
+#ifdef AW_TPL_HAS_MOVE_ONLY_FUNCTION
     std::move_only_function<void()> immediate_cb;
+#else
+    std::function<void()> immediate_cb;
+#endif
     {
         std::lock_guard lock(mtx);
         if (canceled.load(std::memory_order_acquire)) {
