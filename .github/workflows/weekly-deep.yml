@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   weekly-deep:
-    uses: ai-warevo/.github/.github/workflows/reusable-weekly-deep.yml@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
+    uses: ai-warevo/.github/.github/workflows/reusable-weekly-deep.yml@main
     with:
       source_dir: .
       build_dir: build

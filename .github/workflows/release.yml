@@ -28,7 +28,7 @@ permissions:
 
 jobs:
   release:
-    uses: ai-warevo/.github/.github/workflows/reusable-release.yml@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
+    uses: ai-warevo/.github/.github/workflows/reusable-release.yml@main
     with:
       version: ${{ inputs.version || 'auto' }}
     permissions:

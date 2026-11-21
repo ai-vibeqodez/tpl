@@ -11,7 +11,7 @@
 BUILD_TYPE ?= Debug
 PRESET     := $(if $(filter Release,$(BUILD_TYPE)),release,debug)
 
-.PHONY: test demo lint format clean release release-dry-run changelog changelog-dry-run update
+.PHONY: test demo lint format clean release release-dry-run changelog changelog-dry-run
 
 # Configure, build, and run tests only
 build:
@@ -78,10 +78,4 @@ changelog-dry-run:
 		bash scripts/changelog-update.sh --dry-run
 	endif
 
-# Update all scripts from ai-warevo/.github.
-update:
-ifneq ($(IS_POSIX),1)
-	powershell -NoProfile -ExecutionPolicy Bypass -File scripts/updater.ps1
-else
-	bash scripts/updater.sh
-endif
+

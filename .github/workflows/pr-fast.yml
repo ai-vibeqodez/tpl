@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   pr-fast:
-    uses: ai-warevo/.github/.github/workflows/reusable-pr-fast.yml@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
+    uses: ai-warevo/.github/.github/workflows/reusable-pr-fast.yml@main
     with:
       source_dir: .
       build_dir: build
