@@ -1,7 +1,8 @@
 # Weekly Deep — sanitizers + coverage (scheduled + manual)
 #
 # Triggers: scheduled weekly on Monday 00:00 UTC, or manual (workflow_dispatch)
-# Calls: reusable-sanitizers.yml from ai-warevo/.github
+# Calls: ai-warevo/.github reusable-sanitizers.yml with clang18-libstdcxx
+#        (libc++ in clang-18 lacks C++20/23 threading support)
 #
 # This workflow runs the comprehensive test suite:
 #   - ASan + UBSan (full test suite in container)
