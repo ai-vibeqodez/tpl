@@ -90,6 +90,7 @@ set(AW_TPL_HEADERS
     include/aw/tpl/threading/cancellation_token.hpp
     include/aw/tpl/threading/cancellation_token_source.hpp
     include/aw/tpl/threading/thread_pool.hpp
+    include/aw/tpl/threading/detail/callback_function.hpp
     include/aw/tpl/threading/detail/cancellation_state.hpp
     include/aw/tpl/threading/detail/delay_awaiter.hpp
     include/aw/tpl/threading/detail/detached.hpp

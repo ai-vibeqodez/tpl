@@ -1,4 +1,4 @@
-# aw::tpl Exmplaes 42
+# aw::tpl Exmplaes
 
 
 | Example | Covers |

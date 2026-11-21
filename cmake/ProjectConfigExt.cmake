@@ -15,7 +15,7 @@ function(aw_check_cxx23_runtime)
 
     # Propagate -stdlib=libc++ to the compile check (CMAKE_CXX_FLAGS is not
     # automatically picked up by check_cxx_source_compiles).
-    if(CMAKE_CXX_FLAGS MATCHES "-stdlib=libc++")
+    if(CMAKE_CXX_FLAGS MATCHES "-stdlib=libc\\+\\+")
         list(APPEND CMAKE_REQUIRED_FLAGS "-stdlib=libc++")
     endif()
 
@@ -23,7 +23,7 @@ function(aw_check_cxx23_runtime)
 
     # libc++ in Clang ≤ 18 does not provide <format> yet — only check
     # <coroutine> which is the feature actually used by aw::tpl.
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_FLAGS MATCHES "-stdlib=libc++")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_FLAGS MATCHES "-stdlib=libc\\+\\+")
         set(_COROUTINE_TEST "
             #include <coroutine>
             int main() { return 0; }

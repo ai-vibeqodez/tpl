@@ -7,7 +7,7 @@
 namespace aw::tpl::threading::detail {
 
 void CancellationState::cancel() {
-    std::vector<std::pair<std::uint64_t, std::move_only_function<void()>>> to_run;
+    std::vector<std::pair<std::uint64_t, CallbackFunction<void()>>> to_run;
     {
         std::lock_guard lock(mtx);
         if (canceled.exchange(true, std::memory_order_acq_rel)) {
@@ -32,9 +32,9 @@ void CancellationState::cancel() {
     }
 }
 
-std::uint64_t CancellationState::register_callback(std::move_only_function<void()> cb) {
+std::uint64_t CancellationState::register_callback(CallbackFunction<void()> cb) {
     std::uint64_t id = 0;
-    std::move_only_function<void()> immediate_cb;
+    CallbackFunction<void()> immediate_cb;
     {
         std::lock_guard lock(mtx);
         if (canceled.load(std::memory_order_acquire)) {

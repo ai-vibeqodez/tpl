@@ -3,10 +3,11 @@
 #include <atomic>
 #include <coroutine>
 #include <exception>
-#include <functional>
 #include <mutex>
 #include <semaphore>
 #include <vector>
+
+#include <aw/tpl/threading/detail/callback_function.hpp>
 
 namespace aw::tpl::threading::tasks::detail {
 
@@ -30,7 +31,7 @@ struct TaskStateBase {
     std::atomic<bool> ready{false};
     std::vector<std::coroutine_handle<>> continuations;
     /// Fire-and-forget callbacks invoked once on completion; used by when_any optimization.
-    std::vector<std::move_only_function<void()>> completion_callbacks;
+    std::vector<aw::tpl::threading::detail::CallbackFunction<void()>> completion_callbacks;
     std::exception_ptr exception = nullptr;
     std::binary_semaphore done_sem{0};
 
@@ -68,7 +69,7 @@ struct TaskStateBase {
      * @param[in] callback Invoked with no arguments; must not block or throw.
      * @return True if registered (callback will fire later); false if already ready (caller must handle).
      */
-    bool try_attach_completion_callback(std::move_only_function<void()> callback);
+    bool try_attach_completion_callback(aw::tpl::threading::detail::CallbackFunction<void()> callback);
 
     /**
      * @brief @c await_suspend helper: attaches @p awaiting or hands it straight back when already ready.
