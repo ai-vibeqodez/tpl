@@ -1,0 +1,28 @@
+# PR Fast — lint + build + unit tests on every pull request
+#
+# Reusable workflow consumer that delegates to reusable-pr-fast.yml
+# with aw::tpl-specific parameters.
+
+name: PR Fast
+
+on:
+  pull_request:
+    branches: [main, master]
+  merge_group:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  pr-fast:
+    uses: ai-warevo/.github/.github/workflows/reusable-pr-fast.yml@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
+    with:
+      source_dir: .
+      build_dir: build
+      build_type: Debug
+      extra_args: -DAW_TPL_BUILD_TESTS=ON -DAW_TPL_WARNINGS_AS_ERRORS=ON
+      extensions: cpp,hpp,c,h
+      container_image: ghcr.io/ai-warevo/ci-cpp23
+    permissions:
+      contents: read

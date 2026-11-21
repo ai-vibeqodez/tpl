@@ -1,0 +1,30 @@
+# Weekly Deep — sanitizers + coverage + stress tests
+#
+# Reusable workflow consumer that delegates to reusable-weekly-deep.yml
+# with aw::tpl-specific parameters.
+
+name: Weekly Deep
+
+on:
+  push:
+    branches: [main, master]
+  schedule:
+    - cron: '0 2 * * 0'  # 2 AM UTC every Sunday
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  weekly-deep:
+    uses: ai-warevo/.github/.github/workflows/reusable-weekly-deep.yml@f68238cf05c26cfd0d7fa4d2dd1dcad54b50ab9a
+    with:
+      source_dir: .
+      build_dir: build
+      container_image: ghcr.io/ai-warevo/ci-cpp23
+      source_filter: include/ src/
+      exclude: _deps/*
+    permissions:
+      contents: write
+      packages: write
