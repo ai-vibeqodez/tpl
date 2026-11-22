@@ -90,6 +90,12 @@ if(AW_TPL_WARNINGS_AS_ERRORS)
     aw_configure_compiler(TARGET aw_tpl STRICT_WARNINGS)
 endif()
 
+if(AW_ENABLE_COVERAGE)
+    # Add coverage flags to library target for code coverage analysis
+    target_compile_options(aw_tpl PRIVATE --coverage)
+    target_link_options(aw_tpl PRIVATE --coverage)
+endif()
+
 if(AW_TPL_INSTALL)
     aw_install_library(TARGET aw_tpl NAME tpl NS aw::tpl DEPENDENCIES Threads)
 endif()
