@@ -287,7 +287,7 @@ TEST_CASE("when_any with already completed empty task", "[when_any]") {
     
     auto awaiter = [](std::vector<Task<int>> ts) -> Task<bool> {
         Task<Task<int>> winner = when_any(std::move(ts));
-        co_await winner;
+        (void)co_await winner;  // Explicitly ignore result
         co_return true;
     };
     

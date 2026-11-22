@@ -194,7 +194,7 @@ TEST_CASE("when_all with heterogeneous void task", "[when_all]") {
     auto int_task = []() -> Task<int> { co_return 5; };
     
     auto combined = [](Task<void> v, Task<int> i) -> Task<void> {
-        co_await when_all(v, i);
+        (void)co_await when_all(v, i);  // Explicitly ignore result
     };
     
     REQUIRE_NOTHROW(combined(void_task(), int_task()).wait());
