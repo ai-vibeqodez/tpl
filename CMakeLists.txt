@@ -90,6 +90,12 @@ if(AW_TPL_WARNINGS_AS_ERRORS)
     aw_configure_compiler(TARGET aw_tpl STRICT_WARNINGS)
 endif()
 
+if(AW_TPL_ENABLE_COVERAGE)
+    # Add coverage flags for GCC/Clang
+    add_compile_options(--coverage)
+    add_link_options(--coverage)
+endif()
+
 if(AW_TPL_INSTALL)
     aw_install_library(TARGET aw_tpl NAME tpl NS aw::tpl DEPENDENCIES Threads)
 endif()
