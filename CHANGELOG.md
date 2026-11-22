@@ -19,7 +19,7 @@ Maintainer notes (see AGENTS.md, "Changelog & releases"):
 ### Changed
 
 - fix cmake
-- remove local cmake/ duplication, fetch from template-cpp
+- remove local cmake/ duplication, fetch from template_cpp
 - Merge pull request #7 from ai-vibeqodez/loktionov129-patch-3
 - Update README.md
 - Merge branch 'main' of github.com:ai-warevo/tpl

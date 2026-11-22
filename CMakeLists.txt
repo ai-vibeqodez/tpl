@@ -5,12 +5,12 @@ include(FetchContent)
 
 FetchContent_Declare(
     aw_cmake_modules
-    GIT_REPOSITORY https://github.com/ai-warevo/template-cpp
+    GIT_REPOSITORY https://github.com/ai-warevo/template_cpp
     GIT_TAG main
     GIT_SHALLOW ON
 )
 
-# For local development: set FETCHCONTENT_SOURCE_DIR_AW_CMAKE_MODULES to ../template-cpp
+# For local development: set FETCHCONTENT_SOURCE_DIR_AW_CMAKE_MODULES to ../template_cpp
 FetchContent_MakeAvailable(aw_cmake_modules)
 
 # Add remote cmake directory to module search path
