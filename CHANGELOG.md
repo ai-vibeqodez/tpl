@@ -14,6 +14,16 @@ Maintainer notes (see AGENTS.md, "Changelog & releases"):
 
 ## [Unreleased]
 
+## [4.2.4] - 2026-11-22
+
+### Changed
+
+- Merge branch 'main' of github.com:ai-warevo/tpl
+
+### Fixed
+
+- resolve build and lint errors in tpl examples
+
 ## [4.2.3] - 2026-11-22
 
 ### Changed
@@ -220,7 +230,8 @@ Maintainer notes (see AGENTS.md, "Changelog & releases"):
 - `CancellationTokenSource`, `CancellationToken`, `cancel_after` and `OperationCanceledException`.
 - CMake package (`find_package(aw_tpl)` / `FetchContent`) and CI on Windows, Linux and macOS with GitHub Releases.
 
-[Unreleased]: https://github.com/ai-warevo/tpl/compare/v4.2.3...HEAD
+[Unreleased]: https://github.com/ai-warevo/tpl/compare/v4.2.4...HEAD
+[4.2.4]: https://github.com/ai-warevo/tpl/compare/v4.2.3...v4.2.4
 [4.2.3]: https://github.com/ai-warevo/tpl/compare/v4.2.2...v4.2.3
 [4.2.2]: https://github.com/ai-warevo/tpl/compare/v4.2.1...v4.2.2
 [4.2.1]: https://github.com/ai-warevo/tpl/compare/v4.2.0...v4.2.1
