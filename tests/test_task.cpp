@@ -273,7 +273,7 @@ Task<std::vector<std::unique_ptr<int>>> make_ptr_vector() {
     co_return v;
 }
 
-Task<std::unique_ptr<int>> make_ptr_task(int v) {
+Task<std::unique_ptr<int>> make_ptr_task([[maybe_unused]] int v) {
     co_await async_sleep(5ms);
     co_return std::make_unique<int>(v);
 }

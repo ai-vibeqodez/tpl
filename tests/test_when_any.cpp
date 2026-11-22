@@ -283,7 +283,7 @@ TEST_CASE("when_any with single void task", "[when_any]") {
 
 TEST_CASE("when_any with already completed empty task", "[when_any]") {
     std::vector<Task<int>> tasks;
-    tasks.push_back(Task<int>{});  // Empty task
+    tasks.emplace_back();  // Empty task
     
     auto awaiter = [](std::vector<Task<int>> ts) -> Task<bool> {
         Task<Task<int>> winner = when_any(std::move(ts));
