@@ -10,12 +10,18 @@ set(AW_TPL_EXAMPLES
     08_co_spawn
 )
 
+set(_aw_tpl_example_options)
+if(AW_TPL_WARNINGS_AS_ERRORS)
+    list(APPEND _aw_tpl_example_options STRICT_WARNINGS)
+endif()
+
 foreach(example IN LISTS AW_TPL_EXAMPLES)
-    add_executable(aw_tpl_example_${example} ${example}.cpp)
-    target_link_libraries(aw_tpl_example_${example} PRIVATE aw::tpl)
+    aw_add_executable(TARGET aw_tpl_example_${example}
+        SOURCES ${example}.cpp
+        LINK_LIBRARIES aw::tpl
+        ${_aw_tpl_example_options})
 endforeach()
 
-# Runs every example in sequence (used by `ctest`/CI as a smoke test and handy for demos).
 add_custom_target(aw_tpl_examples)
 foreach(example IN LISTS AW_TPL_EXAMPLES)
     add_dependencies(aw_tpl_examples aw_tpl_example_${example})
