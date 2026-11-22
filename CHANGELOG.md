@@ -14,6 +14,15 @@ Maintainer notes (see AGENTS.md, "Changelog & releases"):
 
 ## [Unreleased]
 
+## [4.2.2] - 2026-11-21
+
+### Changed
+
+- lint
+- ci
+- Merge branch 'main' of github.com:ai-warevo/tpl
+- fetch template-cpp from GitHub, support local FETCHCONTENT_SOURCE_DIR
+
 ## [4.2.1] - 2026-11-21
 
 ### Changed
@@ -193,7 +202,8 @@ Maintainer notes (see AGENTS.md, "Changelog & releases"):
 - `CancellationTokenSource`, `CancellationToken`, `cancel_after` and `OperationCanceledException`.
 - CMake package (`find_package(aw_tpl)` / `FetchContent`) and CI on Windows, Linux and macOS with GitHub Releases.
 
-[Unreleased]: https://github.com/ai-warevo/tpl/compare/v4.2.1...HEAD
+[Unreleased]: https://github.com/ai-warevo/tpl/compare/v4.2.2...HEAD
+[4.2.2]: https://github.com/ai-warevo/tpl/compare/v4.2.1...v4.2.2
 [4.2.1]: https://github.com/ai-warevo/tpl/compare/v4.2.0...v4.2.1
 [4.2.0]: https://github.com/ai-warevo/tpl/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/ai-warevo/tpl/compare/v4.0.1...v4.1.0
