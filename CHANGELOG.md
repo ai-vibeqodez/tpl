@@ -14,6 +14,19 @@ Maintainer notes (see AGENTS.md, "Changelog & releases"):
 
 ## [Unreleased]
 
+## [4.2.5] - 2026-11-22
+
+### Changed
+
+- use reusable-coverage-badge workflow
+- Merge branch 'main' of github.com:ai-warevo/tpl
+- Merge pull request #11 from ai-warevo/loktionov129-patch-7
+- Update README.md
+
+### Fixed
+
+- enable coverage badge updates for scheduled/manual runs
+
 ## [4.2.4] - 2026-11-22
 
 ### Changed
@@ -230,7 +243,8 @@ Maintainer notes (see AGENTS.md, "Changelog & releases"):
 - `CancellationTokenSource`, `CancellationToken`, `cancel_after` and `OperationCanceledException`.
 - CMake package (`find_package(aw_tpl)` / `FetchContent`) and CI on Windows, Linux and macOS with GitHub Releases.
 
-[Unreleased]: https://github.com/ai-warevo/tpl/compare/v4.2.4...HEAD
+[Unreleased]: https://github.com/ai-warevo/tpl/compare/v4.2.5...HEAD
+[4.2.5]: https://github.com/ai-warevo/tpl/compare/v4.2.4...v4.2.5
 [4.2.4]: https://github.com/ai-warevo/tpl/compare/v4.2.3...v4.2.4
 [4.2.3]: https://github.com/ai-warevo/tpl/compare/v4.2.2...v4.2.3
 [4.2.2]: https://github.com/ai-warevo/tpl/compare/v4.2.1...v4.2.2
