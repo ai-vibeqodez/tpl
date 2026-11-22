@@ -134,3 +134,30 @@ TEST_CASE("co_spawn group can be awaited from a coroutine", "[spawn]") {
     drain(group).wait();
     REQUIRE(group.pending() == 0);
 }
+
+TEST_CASE("co_spawn without group with void task", "[spawn]") {
+    std::binary_semaphore sem{0};
+    std::atomic<bool> called{false};
+    
+    co_spawn([]() -> Task<void> { co_return; }(), [&](std::exception_ptr) {
+        called = true;
+        sem.release();
+    });
+    
+    // Give it time to finish
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    
+    REQUIRE_FALSE(called);
+}
+
+TEST_CASE("co_spawn with group and void task success", "[spawn]") {
+    TaskGroup group;
+    std::atomic<bool> handler_called{false};
+    
+    co_spawn(group, []() -> Task<void> { co_return; }(), [&](std::exception_ptr) {
+        handler_called = true;
+    });
+    
+    group.wait();
+    REQUIRE_FALSE(handler_called);
+}
