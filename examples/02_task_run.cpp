@@ -14,13 +14,13 @@ using namespace aw::tpl::threading::tasks;
 
 struct MoveOnlyJob {
     std::unique_ptr<int> value;
-    int operator()() { return *value * 2; }
+    int operator()() const { return *value * 2; }
 };
 
 Task<int> parallel_sum(std::vector<int> numbers) {
     // run() stores the callable inside the coroutine frame, so capturing by value is always safe.
     int total = co_await Task<>::run(
-        [numbers = std::move(numbers)] { return std::accumulate(numbers.begin(), numbers.end(), 0); });
+        [numbers = std::move(numbers)] { return std::accumulate(numbers.begin(), numbers.end(), 0); });  // NOLINT(modernize-use-ranges,boost-use-ranges)
     co_return total;
 }
 

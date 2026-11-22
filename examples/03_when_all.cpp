@@ -55,7 +55,7 @@ Task<void> app() {
     };
     std::vector<int> results = co_await when_all(std::move(many));
     std::print("vector:");
-    std::for_each(results.begin(), results.end(), [](int r) { std::print(" {}", r); });
+    std::ranges::for_each(results, [](int r) { std::print(" {}", r); });
     std::print("\n");
 
     // 4. Vector of Task<void>.

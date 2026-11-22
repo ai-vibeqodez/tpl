@@ -1,0 +1,23 @@
+# clang-tidy configuration for aw::tpl examples
+# Examples are demonstration code, not production library code.
+# Inherit all production checks from parent, then relax example-specific patterns.
+
+InheritParentConfig: true
+
+Checks:
+  # Using-namespace directives are acceptable in example .cpp files (not headers)
+  # for clarity and brevity in demonstration code
+  - '-google-build-using-namespace'
+  # Macros are used in examples for brevity (assert-like constructs)
+  - '-cppcoreguidelines-macro-usage'
+  # Magic numbers appear frequently in examples for demonstration
+  - '-cppcoreguidelines-avoid-magic-numbers'
+  - '-readability-magic-numbers'
+  # Avoid-do-while: examples may use do-while for clarity
+  - '-cppcoreguidelines-avoid-do-while'
+  # Anonymous namespace: static functions in examples are fine
+  - '-misc-use-anonymous-namespace'
+  # Capturing lambda coroutines: examples may intentionally capture for brevity
+  - '-cppcoreguidelines-avoid-capturing-lambda-coroutines'
+  # Reference coroutine parameters: examples may use references for clarity
+  - '-cppcoreguidelines-avoid-reference-coroutine-parameters'

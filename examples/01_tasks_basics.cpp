@@ -103,7 +103,7 @@ int main() {
     // std::ranges::for_each: print all results in one pass.
     std::vector<int> vals = {7, 49, 121};
     std::print("std::for_each:");
-    std::for_each(vals.begin(), vals.end(), [](int v) { std::print(" {}", v); });
+    std::ranges::for_each(vals, [](int v) { std::print(" {}", v); });
     std::print("\n");
 
     // if constexpr helper: works with both atomic and plain types.

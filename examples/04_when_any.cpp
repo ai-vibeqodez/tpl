@@ -89,8 +89,8 @@ Task<void> app() {
 
         Task<void> winner = co_await when_any(slow, quick, text);
         std::print("3. winner is `quick`? {}\n", bool_str(winner == quick));
-        co_await winner;               // observe completion / rethrow failure
-        co_await when_all(slow, text); // the losers keep running; wait for them if you care
+        co_await winner;                      // observe completion / rethrow failure
+        (void)co_await when_all(slow, text);  // the losers keep running; wait for them if you care
     }
 
     // 4. A failed task also counts as completed; the failure appears on the second await.
