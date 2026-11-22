@@ -14,13 +14,23 @@ Maintainer notes (see AGENTS.md, "Changelog & releases"):
 
 ## [Unreleased]
 
+## [4.2.3] - 2026-11-22
+
 ### Changed
 
-- reuse shared `template_cpp` CMake target, test, and compiler helpers
+- use shared template_cpp CMake helpers for project setup and testing
+- clang-tidy
+- clang-tidy
+- Merge branch 'main' of github.com:ai-warevo/tpl
+- cmake
+- finalize canonical clang-tidy configuration with all exclusions
+- merge project-specific clang-tidy exclusions into canonical config
+- use tobus .clang-tidy as canonical configuration
+- synchronize clang-tidy config from template-cpp
 
 ### Fixed
 
-- configure shared compiler warning flags after `project()` for Linux and MSVC builds
+- configure shared warning flags after project
 
 ## [4.2.2] - 2026-11-21
 
@@ -210,7 +220,8 @@ Maintainer notes (see AGENTS.md, "Changelog & releases"):
 - `CancellationTokenSource`, `CancellationToken`, `cancel_after` and `OperationCanceledException`.
 - CMake package (`find_package(aw_tpl)` / `FetchContent`) and CI on Windows, Linux and macOS with GitHub Releases.
 
-[Unreleased]: https://github.com/ai-warevo/tpl/compare/v4.2.2...HEAD
+[Unreleased]: https://github.com/ai-warevo/tpl/compare/v4.2.3...HEAD
+[4.2.3]: https://github.com/ai-warevo/tpl/compare/v4.2.2...v4.2.3
 [4.2.2]: https://github.com/ai-warevo/tpl/compare/v4.2.1...v4.2.2
 [4.2.1]: https://github.com/ai-warevo/tpl/compare/v4.2.0...v4.2.1
 [4.2.0]: https://github.com/ai-warevo/tpl/compare/v4.1.0...v4.2.0
