@@ -22,6 +22,7 @@ include(ProjectConfig)
 aw_project_config(NAME tpl NS aw::)
 
 project(${AW_PROJECT_NAME} VERSION ${AW_PROJECT_VERSION} LANGUAGES CXX)
+aw_configure_warnings()
 
 # --- Find dependencies (before using them) ---
 find_package(Threads REQUIRED)
